@@ -61,7 +61,15 @@ module.exports = function(grunt) {
           }
         },
         files: {
-          'kt-angular-date-picker.js': ['js/*.js', 'js/template/template-cache.js']
+          'kt-angular-date-picker.js': [
+            'js/*.js',
+            'js/template/template-cache.js'
+          ],
+          'kt-angular-date-picker.standalone.js': [
+            'bower_components/kt-angular-util/js/components/style.js',
+            'js/*.js',
+            'js/template/template-cache.js'
+          ]
         }
       }
     }
@@ -74,5 +82,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
 
   grunt.registerTask('build-css', ['sass', 'postcss']);
+  grunt.registerTask('build-template', ['html2js', 'concat']);
   grunt.registerTask('default', ['watch']);
 };

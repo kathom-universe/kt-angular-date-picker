@@ -1,0 +1,15 @@
+<div>
+  <div class="kt-date-picker-header">
+    <button type="button" ng-click="previousYear()">Previous Year</button>
+    <button type="button" ng-click="yearClick()">{{monthPicker.year}}</button>
+    <button type="button" ng-click="nextYear()">Next Year</button>
+  </div>
+  <div class="kt-date-picker-content">
+    <div class="kt-month-picker-cell"
+         ng-repeat="month in monthPicker.months"
+         ng-class="{'kt-date-picker-selected': isSelected(month)}">
+      <button type="button" ng-click="selectMonth(month)">{{month | monthFormat}}</button>
+    </div>
+  </div>
+  <div class="kt-date-picker-footer"></div>
+</div>

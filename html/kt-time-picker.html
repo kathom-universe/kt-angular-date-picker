@@ -1,0 +1,27 @@
+<div>
+  <div class="kt-date-picker-header">
+    <div>Hour</div>
+    <div>Minute</div>
+  </div>
+  <div class="kt-date-picker-content">
+    <div class="kt-time-picker-outer">
+      <div class="kt-time-picker-inner" kt-hide-scrollbar>
+        <div class="kt-time-picker-cell"
+             ng-repeat="hour in timePicker.hours"
+             ng-class="{'kt-date-picker-selected': isHourSelected(hour)}">
+          <button type="button" ng-click="selectHour(hour)">{{hour}}</button>
+        </div>
+      </div>
+    </div>
+    <div class="kt-time-picker-outer">
+      <div class="kt-time-picker-inner" kt-hide-scrollbar>
+        <div class="kt-time-picker-cell"
+             ng-repeat="minute in timePicker.minutes"
+             ng-class="{'kt-date-picker-selected': isMinuteSelected(minute)}">
+          <button type="button" ng-click="selectMinute(minute)">{{minute}}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="kt-date-picker-footer"></div>
+</div>
