@@ -1,0 +1,17 @@
+{
+  "name": "kt-angular-date-picker",
+  "homepage": "https://github.com/KathomDev/kt-angular-date-picker",
+  "authors": [
+    "Thomas Greber <thomas@kathom.ch>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
