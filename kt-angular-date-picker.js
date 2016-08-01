@@ -1,7 +1,7 @@
 (function (){
   'use strict';
 
-  var datePicker = angular.module('kt.datePicker', ['kt.util.style']);
+  var datePicker = angular.module('kt.datePicker', ['kt.util.style', 'kt.dropdown']);
 
   datePicker.directive('ktDatePicker', [function () {
     return {
@@ -46,6 +46,47 @@
         });
       }
     }
+  }]);
+
+  datePicker.directive('ktDatePickerInput', [function () {
+    var instanceCount = 0;
+
+    return {
+      restrict: 'E',
+      scope: {
+        date: '=',
+        format: '@'
+      },
+      template:
+        '<input type="text" ng-model="dateString" ng-change="dateStringChanged()" kt-dropdown=".ktDatePickerInput_{{instanceCount}}">' +
+        '<kt-date-picker class="ktDatePickerInput_{{instanceCount}}" date="date"></kt-date-picker>',
+      link: function (scope) {
+        scope.instanceCount = instanceCount++;
+        scope.dateString = '';
+
+        scope.$watch('date', function (date) {
+          if (!date) {
+            return;
+          }
+
+          scope.dateString = date.format(scope.format);
+        }, true);
+
+        scope.dateStringChanged = function () {
+          var date = moment(scope.dateString, scope.format, true);
+
+          if (!date.isValid()) {
+            return;
+          }
+
+          if (!scope.date) {
+            scope.date = date.clone();
+          } else {
+            scope.date.year(date.year()).month(date.month()).date(date.date());
+          }
+        };
+      }
+    };
   }]);
 
 

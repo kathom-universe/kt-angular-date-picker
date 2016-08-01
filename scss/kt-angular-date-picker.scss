@@ -119,7 +119,8 @@ kt-date-picker, kt-day-picker, kt-month-picker, kt-year-picker, kt-time-picker {
 
 kt-date-picker {
   kt-day-picker, kt-month-picker, kt-year-picker {
-    width: 100%;
+    width   : 100%;
+    padding : 0;
   }
 
   .kt-date-picker-content {
@@ -216,5 +217,15 @@ kt-time-picker {
     button {
       @include kt-date-picker-cell-button(circle);
     }
+  }
+}
+
+kt-date-picker-input {
+  kt-date-picker {
+    position   : absolute;
+    background : $kt-date-picker-background;
+    border     : $kt-date-picker-border;
+    box-shadow : $kt-date-picker-shadow;
+    z-index    : 1;
   }
 }
