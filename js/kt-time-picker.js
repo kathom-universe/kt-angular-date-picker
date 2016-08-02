@@ -74,4 +74,45 @@
       }
     };
   }]);
+
+  timePicker.directive('ktTimePickerInput', [function () {
+    var instanceCount = 0;
+
+    return {
+      restrict: 'E',
+      scope: {
+        date: '=',
+        format: '@'
+      },
+      template:
+      '<input type="text" ng-model="timeString" ng-change="timeStringChanged()" kt-dropdown=".ktTimePickerInput_{{instanceCount}}">' +
+      '<kt-time-picker class="ktTimePickerInput_{{instanceCount}}" date="date"></kt-time-picker>',
+      link: function (scope) {
+        scope.instanceCount = instanceCount++;
+        scope.timeString = '';
+
+        scope.$watch('date', function (date) {
+          if (!date) {
+            return;
+          }
+
+          scope.timeString = date.format(scope.format);
+        }, true);
+
+        scope.timeStringChanged = function () {
+          var date = moment(scope.timeString, scope.format, true);
+
+          if (!date.isValid()) {
+            return;
+          }
+
+          if (!scope.date) {
+            scope.date = date.clone();
+          } else {
+            scope.date.hour(date.hour()).minute(date.minute());
+          }
+        };
+      }
+    };
+  }]);
 })();

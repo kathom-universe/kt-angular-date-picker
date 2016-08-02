@@ -220,12 +220,11 @@ kt-time-picker {
   }
 }
 
-kt-date-picker-input {
-  kt-date-picker {
-    position   : absolute;
-    background : $kt-date-picker-background;
-    border     : $kt-date-picker-border;
-    box-shadow : $kt-date-picker-shadow;
-    z-index    : 1;
-  }
+kt-date-picker-input kt-date-picker,
+kt-time-picker-input kt-time-picker {
+  position   : absolute;
+  background : $kt-date-picker-background;
+  border     : $kt-date-picker-border;
+  box-shadow : $kt-date-picker-shadow;
+  z-index    : 1;
 }
