@@ -1,4 +1,12 @@
 angular.module('kt.datePicker').run(['$templateCache', function($templateCache) {
+  $templateCache.put("html/kt-date-range-picker.html",
+    "<div>\n" +
+    "    <div class=\"kt-date-range-picker-header\" style=\"display: table; width: 100%\">\n" +
+    "        {{startDate.format('DD.MM.YYYY')}}\n" +
+    "        {{endDate.format('DD.MM.YYYY')}}\n" +
+    "    </div>\n" +
+    "    <kt-date-picker date=\"date\"></kt-date-picker>\n" +
+    "</div>");
   $templateCache.put("html/kt-day-picker.html",
     "<div>\n" +
     "  <div class=\"kt-date-picker-header\">\n" +

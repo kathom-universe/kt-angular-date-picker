@@ -106,6 +106,12 @@
             scope.date = date.clone();
           }
           scope.date.year(date.year()).month(date.month()).date(date.date());
+
+          var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
+
+          if (parentElement && parentElement.prop('tagName').toLowerCase() === 'kt-date-picker') {
+            scope.$emit('dayPicker:daySelect');
+          }
         };
 
         scope.previousMonth = function () {

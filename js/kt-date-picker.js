@@ -25,6 +25,16 @@
           return currentPicker === picker;
         };
 
+        scope.$on('dayPicker:daySelect', function (ev) {
+          var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
+
+          if (parentElement && parentElement.prop('tagName').toLowerCase() === 'kt-date-range-picker') {
+            scope.$emit('datePicker:dateSelect');
+          }
+
+          ev.stopPropagation();
+        });
+
         scope.$on('dayPicker:monthClick', function (ev) {
           currentPicker = 'month';
           ev.stopPropagation();
@@ -85,6 +95,37 @@
             scope.date.year(date.year()).month(date.month()).date(date.date());
           }
         };
+      }
+    };
+  }]);
+
+  datePicker.directive('ktDateRangePicker', [function () {
+    return {
+      restrict: 'E',
+      scope: {
+        startDate: '=',
+        endDate: '='
+      },
+      templateUrl: 'html/kt-date-range-picker.html',
+      link: function (scope, element) {
+        scope.element = element;
+
+        scope.startDate = scope.startDate || moment().clone();
+        scope.endDate = scope.endDate || moment().clone();
+
+        scope.date = scope.startDate;
+
+        scope.$on('datePicker:dateSelect', function (ev) {
+          ev.stopPropagation();
+          if (scope.date === scope.startDate) {
+            scope.date = scope.endDate;
+            return;
+          }
+          if (scope.date === scope.endDate) {
+            scope.date = scope.startDate;
+            return;
+          }
+        });
       }
     };
   }]);
