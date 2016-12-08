@@ -1,7 +1,6 @@
 (function (){
   'use strict';
 
-
   var util = angular.module('kt.datePicker');
 
   util.directive('ktDatePickerNextIcon', function () {
@@ -18,6 +17,49 @@
     };
   });
 
+  util.factory('ktDatePickerService', function () {
+    var service = {};
+
+    service.isDateWithinBounds = function (date, minDate, maxDate, precision, inclusivity) {
+      if (minDate && maxDate && minDate.isAfter(maxDate)) {
+        return true;
+      }
+
+      if (minDate && maxDate) {
+        return date.isBetween(minDate, maxDate, precision, inclusivity);
+      }
+
+      if (minDate && !maxDate) {
+        return date.isSameOrAfter(minDate, precision);
+      }
+
+      if (!minDate && maxDate) {
+        return date.isSameOrBefore(maxDate, precision);
+      }
+
+      return true;
+    }
+
+    service.getDateWithinBounds = function (date, minDate, maxDate, precision, inclusivity, roundTo) {
+      if (angular.isUndefined(date)) {
+        date = moment().clone();
+      }
+
+      if (service.isDateWithinBounds(date, minDate, maxDate, precision, inclusivity)) {
+        return date.clone();
+      }
+
+      switch (roundTo) {
+        case 'month': return date.date(1);
+        case 'year': return date.dayOfYear(1);
+      }
+
+      return angular.isDefined(minDate) ? minDate.clone() : maxDate.clone();
+    };
+
+    return service;
+  });
+
 
 
   var datePicker = angular.module('kt.datePicker', ['kt.util.style', 'kt.dropdown']);
@@ -26,12 +68,14 @@
     return {
       restrict: 'E',
       scope: {
-        date: '='
+        date: '=',
+        minDate: '=',
+        maxDate: '='
       },
       template:
-      '<kt-day-picker date="$parent.date" ng-if="isCurrentPicker(\'day\')"></kt-day-picker>' +
-      '<kt-month-picker date="$parent.date" ng-if="isCurrentPicker(\'month\')"></kt-month-picker>' +
-      '<kt-year-picker date="$parent.date" ng-if="isCurrentPicker(\'year\')"></kt-year-picker> ',
+      '<kt-day-picker date="$parent.date" min-date="$parent.minDate" max-date="$parent.maxDate" ng-if="isCurrentPicker(\'day\')"></kt-day-picker>' +
+      '<kt-month-picker date="$parent.date" min-date="$parent.minDate" max-date="$parent.maxDate" ng-if="isCurrentPicker(\'month\')"></kt-month-picker>' +
+      '<kt-year-picker date="$parent.date" min-date="$parent.minDate" max-date="$parent.maxDate" ng-if="isCurrentPicker(\'year\')"></kt-year-picker> ',
       link: function (scope, element) {
         scope.element = element;
         var currentPicker = 'day';
@@ -77,78 +121,76 @@
     }
   }]);
 
-  datePicker.directive('ktDatePickerInput', [function () {
+  datePicker.directive('ktDatePickerInput', ['ktDatePickerService', function (datePickerService) {
     var instanceCount = 0;
 
     return {
       restrict: 'E',
       scope: {
         date: '=',
+        minDate: '=',
+        maxDate: '=',
         format: '@'
       },
       template:
         '<input type="text" ng-model="dateString" ng-change="dateStringChanged()" kt-dropdown=".ktDatePickerInput_{{instanceCount}}">' +
-        '<kt-date-picker class="ktDatePickerInput_{{instanceCount}}" date="date"></kt-date-picker>',
+        '<kt-date-picker class="ktDatePickerInput_{{instanceCount}}" date="date" min-date="minDate" max-date="maxDate"></kt-date-picker>',
       link: function (scope) {
         scope.instanceCount = instanceCount++;
         scope.dateString = '';
 
-        scope.$watch('date', function (date) {
-          if (!date) {
-            return;
-          }
+        scope.date = datePickerService.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate);
 
+        scope.$watch('date', function (date) {
           scope.dateString = date.format(scope.format);
         }, true);
 
         scope.dateStringChanged = function () {
           var date = moment(scope.dateString, scope.format, true);
 
-          if (!date.isValid()) {
+          if (!date.isValid() || !datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, null, '[]')) {
             return;
           }
 
-          if (!scope.date) {
-            scope.date = date.clone();
-          } else {
-            scope.date.year(date.year()).month(date.month()).date(date.date());
-          }
+          scope.date.year(date.year()).month(date.month()).date(date.date());
         };
       }
     };
   }]);
 
-  datePicker.directive('ktDateRangePicker', [function () {
+  datePicker.directive('ktDateRangePicker', ['ktDatePickerService',  function (datePickerService) {
     return {
       restrict: 'E',
       scope: {
         startDate: '=',
-        endDate: '='
+        endDate: '=',
+        minDate: '=',
+        maxDate: '='
       },
       templateUrl: 'html/kt-date-range-picker.html',
       link: function (scope, element) {
         scope.element = element;
+        var currentPicker = 'start';
 
-        scope.startDate = scope.startDate || moment().clone();
-        scope.endDate = scope.endDate || moment().clone();
+        scope.startDate =  datePickerService.getDateWithinBounds(scope.startDate, scope.minDate, scope.maxDate);
+        scope.endDate =  datePickerService.getDateWithinBounds(scope.endDate, scope.minDate, scope.maxDate);
 
-        scope.date = scope.startDate;
+        scope.$watch('startDate', function (startDate) {
+          scope.endDate = datePickerService.getDateWithinBounds(scope.endDate, startDate, scope.maxDate);
+        }, true);
 
         scope.$on('datePicker:dateSelect', function (ev) {
           ev.stopPropagation();
-          if (scope.date === scope.startDate) {
-            scope.date = scope.endDate;
-            return;
-          }
-          if (scope.date === scope.endDate) {
-            scope.date = scope.startDate;
-            return;
-          }
+
+          currentPicker = currentPicker === 'start' ? 'end' : 'start';
         });
+
+        scope.isCurrentPicker = function (picker) {
+          return currentPicker === picker;
+        };
       }
     };
   }]);
-
 
 
 
@@ -230,33 +272,30 @@
     return service;
   }]);
 
-  dayPicker.directive('ktDayPicker', ['ktDayPickerSvc', function (service) {
+  dayPicker.directive('ktDayPicker', ['ktDayPickerSvc', 'ktDatePickerService', function (dayPickerService, datePickerService) {
     return {
       restrict: 'E',
       templateUrl: 'html/kt-day-picker.html',
       scope: {
-        date: '='
+        date: '=',
+        minDate: '=',
+        maxDate: '='
       },
       link: function (scope) {
         scope.dayPicker = {
           month: undefined,
           year: undefined,
           weeks: undefined,
-          dayHeaders: service.getDayHeaders()
+          dayHeaders: dayPickerService.getDayHeaders()
         };
 
-        scope.$watch('date', function (date) {
-          if (!date) {
-            date = moment().clone();
-          }
+        scope.date = datePickerService.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate, 'day', '[]');
 
+        scope.$watch('date', function (date) {
           resetDayPicker(date);
         }, true);
 
         scope.selectDate = function (date) {
-          if (!scope.date) {
-            scope.date = date.clone();
-          }
           scope.date.year(date.year()).month(date.month()).date(date.date());
 
           var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
@@ -272,10 +311,22 @@
           resetDayPicker(date);
         };
 
+        scope.hasPreviousMonth = function () {
+          var date = moment({year: scope.dayPicker.year, month: scope.dayPicker.month});
+          date.subtract(1, 'months');
+          return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', []);
+        };
+
         scope.nextMonth = function () {
           var date = moment({year: scope.dayPicker.year, month: scope.dayPicker.month});
           date.add(1, 'months');
           resetDayPicker(date);
+        };
+
+        scope.hasNextMonth = function () {
+          var date = moment({year: scope.dayPicker.year, month: scope.dayPicker.month});
+          date.add(1, 'months');
+          return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', []);
         };
 
         scope.isSelected = function (date) {
@@ -292,12 +343,26 @@
           return date.month() !== scope.dayPicker.month;
         };
 
+        scope.isInMinMaxRange = function (date) {
+          return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'day', '[]');
+        };
+
         scope.monthClick = function () {
           var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
 
           if (parentElement && parentElement.prop('tagName').toLowerCase() === 'kt-date-picker') {
             scope.$emit('dayPicker:monthClick');
           }
+        };
+
+        scope.canChooseMonth = function () {
+          var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
+
+          if (parentElement && parentElement.prop('tagName').toLowerCase() === 'kt-date-picker' && (scope.hasPreviousMonth() || scope.hasNextMonth())) {
+            return true;
+          }
+
+          return false;
         };
 
 
@@ -313,7 +378,7 @@
 
           scope.dayPicker.month = date.month();
           scope.dayPicker.year = date.year();
-          scope.dayPicker.weeks = service.getWeeksInMonth(scope.dayPicker.year, scope.dayPicker.month);
+          scope.dayPicker.weeks = dayPickerService.getWeeksInMonth(scope.dayPicker.year, scope.dayPicker.month);
         }
       }
     };
@@ -322,10 +387,9 @@
 
 
 
-
   var monthPicker = angular.module('kt.datePicker');
 
-  monthPicker.directive('ktMonthPicker', [function () {
+  monthPicker.directive('ktMonthPicker', ['ktDatePickerService', function (datePickerService) {
     var months;
 
     function getMonths() {
@@ -339,10 +403,16 @@
       return months;
     }
 
+    function getDateWithinBounds(date, minDate, maxDate) {
+      var dateWithinBounds = datePickerService.getDateWithinBounds(date, minDate, maxDate, 'day', '[]');
+    }
+
     return {
       restrict: 'E',
       scope: {
-        date: '='
+        date: '=',
+        minDate: '=',
+        maxDate: '='
       },
       templateUrl: 'html/kt-month-picker.html',
       link: function (scope) {
@@ -351,28 +421,27 @@
           months: getMonths()
         };
 
-        scope.$watch('date', function (date) {
-          if (!date) {
-            date = moment().clone();
-          }
+        scope.date = datePickerService.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate, 'month', '[]');
 
+        scope.$watch('date', function (date) {
           scope.monthPicker.year = date.year();
         }, true);
 
         scope.isSelected = function (month) {
-          if (!scope.date) {
-            return false;
-          }
-
           return scope.date.year() === scope.monthPicker.year && scope.date.month() === month;
         };
 
+        scope.isInMinMaxRange = function (month) {
+          var date = moment().clone().year(scope.monthPicker.year).month(month);
+          return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', '[]');
+        };
+
         scope.selectMonth = function (month) {
-          if (!scope.date) {
-            scope.date = moment().clone().year(scope.monthPicker.year).month(month);
-          } else {
-            scope.date.year(scope.monthPicker.year).month(month);
-          }
+          var date = datePickerService.getDateWithinBounds(
+            scope.date.clone().year(scope.monthPicker.year).month(month), scope.minDate, scope.maxDate, 'day', [], 'month'
+          );
+
+          scope.date.year(date.year()).month(date.month()).date(date.date());
 
           var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
 
@@ -385,8 +454,20 @@
           scope.monthPicker.year = scope.monthPicker.year - 1;
         };
 
+        scope.hasPreviousYear = function () {
+          var date = moment({year: scope.monthPicker.year});
+          date.subtract(1, 'year');
+          return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', []);
+        };
+
         scope.nextYear = function () {
           scope.monthPicker.year = scope.monthPicker.year + 1;
+        };
+
+        scope.hasNextYear = function () {
+          var date = moment({year: scope.monthPicker.year});
+          date.add(1, 'year');
+          return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', []);
         };
 
         scope.yearClick = function () {
@@ -396,13 +477,22 @@
             scope.$emit('monthPicker:yearClick');
           }
         };
+
+        scope.canChooseYear = function () {
+          var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
+
+          if (parentElement && parentElement.prop('tagName').toLowerCase() === 'kt-date-picker' && (scope.hasPreviousYear() || scope.hasNextYear())) {
+            return true;
+          }
+
+          return false;
+        };
       }
     };
   }]);
 
 
-
-
+
 
   var timePicker = angular.module('kt.datePicker');
 
@@ -522,10 +612,9 @@
 
 
 
-
   var yearPicker = angular.module('kt.datePicker');
 
-  yearPicker.directive('ktYearPicker', [function () {
+  yearPicker.directive('ktYearPicker', ['ktDatePickerService', function (datePickerService) {
     function getDecade(year) {
       var start = year - year % 10;
       var end = start + 9;
@@ -550,7 +639,9 @@
       restrict: 'E',
       templateUrl: 'html/kt-year-picker.html',
       scope: {
-        date: '='
+        date: '=',
+        minDate: '=',
+        maxDate: '='
       },
       link: function (scope) {
         var decade = getDecade(scope.date ? scope.date.year() : moment().clone().year());
@@ -560,11 +651,9 @@
           years: getYears(decade)
         };
 
-        scope.$watch('date', function (date) {
-          if (!date) {
-            date = moment().clone();
-          }
+        scope.date = datePickerService.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate, 'year', '[]');
 
+        scope.$watch('date', function (date) {
           if (scope.yearPicker.years.indexOf(date.year()) === -1) {
             scope.yearPicker.decade = getDecade(date.year());
             scope.yearPicker.years = getYears(scope.yearPicker.decade);
@@ -572,11 +661,11 @@
         }, true);
 
         scope.selectYear = function (year) {
-          if (!scope.date) {
-            scope.date = moment().clone().year(year);
-          } else {
-            scope.date.year(year);
-          }
+          var date = datePickerService.getDateWithinBounds(
+            scope.date.clone().year(year), scope.minDate, scope.maxDate, 'day', [], 'year'
+          );
+
+          scope.date.year(date.year()).month(date.month()).date(date.date());
 
           var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
           if (parentElement && parentElement.prop('tagName').toLowerCase() === 'kt-date-picker') {
@@ -590,10 +679,22 @@
           scope.yearPicker.years = getYears(scope.yearPicker.decade);
         };
 
+        scope.hasPreviousDecade = function () {
+          var date = moment().clone().year(scope.yearPicker.years[0]);
+          date.subtract(1, 'years');
+          return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', '[]');
+        };
+
         scope.nextDecade = function () {
           scope.yearPicker.decade.start += 10;
           scope.yearPicker.decade.end += 10;
           scope.yearPicker.years = getYears(scope.yearPicker.decade);
+        };
+
+        scope.hasNextDecade = function () {
+          var date = moment().clone().year(scope.yearPicker.years[0]);
+          date.add(10, 'years');
+          return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', '[]');
         };
 
         scope.isSelected = function (year) {
@@ -607,6 +708,11 @@
         scope.isOverflowing = function (year) {
           return year < scope.yearPicker.decade.start || year > scope.yearPicker.decade.end;
         };
+
+        scope.isInMinMaxRange = function (year) {
+          var date = moment().clone().year(year);
+          return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', '[]')
+        };
       }
     };
   }]);
@@ -616,17 +722,19 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
   $templateCache.put("html/kt-date-range-picker.html",
     "<div>\n" +
     "    <div class=\"kt-date-range-picker-header\" style=\"display: table; width: 100%\">\n" +
-    "        {{startDate.format('DD.MM.YYYY')}}\n" +
-    "        {{endDate.format('DD.MM.YYYY')}}\n" +
+    "        {{startDate.format('DD.MM.YYYY')}} - {{endDate.format('DD.MM.YYYY')}}\n" +
     "    </div>\n" +
-    "    <kt-date-picker date=\"date\"></kt-date-picker>\n" +
+    "    {{ isCurrentPicker('start') }}\n" +
+    "    {{ isCurrentPicker('end') }}\n" +
+    "    <kt-date-picker date=\"$parent.startDate\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" ng-if=\"isCurrentPicker('start')\"></kt-date-picker>\n" +
+    "    <kt-date-picker date=\"$parent.endDate\" min-date=\"$parent.startDate\" max-date=\"$parent.maxDate\" ng-if=\"isCurrentPicker('end')\"></kt-date-picker>\n" +
     "</div>");
   $templateCache.put("html/kt-day-picker.html",
     "<div>\n" +
     "  <div class=\"kt-date-picker-header\">\n" +
-    "    <button type=\"button\" ng-click=\"previousMonth()\"><kt-date-picker-previous-icon></kt-date-picker-previous-icon></button>\n" +
-    "    <button type=\"button\" ng-click=\"monthClick()\">{{dayPicker.month | monthFormat}} {{dayPicker.year}}</button>\n" +
-    "    <button type=\"button\" ng-click=\"nextMonth()\"><kt-date-picker-next-icon></kt-date-picker-next-icon></button>\n" +
+    "    <button type=\"button\" ng-click=\"previousMonth()\" ng-disabled=\"!hasPreviousMonth()\"><kt-date-picker-previous-icon></kt-date-picker-previous-icon></button>\n" +
+    "    <button type=\"button\" ng-click=\"monthClick()\" ng-disabled=\"!canChooseMonth()\">{{dayPicker.month | monthFormat}} {{dayPicker.year}}</button>\n" +
+    "    <button type=\"button\" ng-click=\"nextMonth()\" ng-disabled=\"!hasNextMonth()\"><kt-date-picker-next-icon></kt-date-picker-next-icon></button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-date-picker-content\">\n" +
     "    <div class=\"kt-day-picker-row\">\n" +
@@ -638,7 +746,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "      <div class=\"kt-day-picker-cell\"\n" +
     "           ng-repeat=\"date in week.dates\"\n" +
     "           ng-class=\"{'kt-date-picker-selected': isSelected(date), 'kt-date-picker-overflow': isOverflowing(date)}\">\n" +
-    "        <button type=\"button\" ng-click=\"selectDate(date)\">\n" +
+    "        <button type=\"button\" ng-click=\"selectDate(date)\" ng-disabled=\"!isInMinMaxRange(date)\">\n" +
     "          {{date.format('D')}}\n" +
     "        </button>\n" +
     "      </div>\n" +
@@ -650,15 +758,15 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
   $templateCache.put("html/kt-month-picker.html",
     "<div>\n" +
     "  <div class=\"kt-date-picker-header\">\n" +
-    "    <button type=\"button\" ng-click=\"previousYear()\"><kt-date-picker-previous-icon></kt-date-picker-previous-icon></button>\n" +
-    "    <button type=\"button\" ng-click=\"yearClick()\">{{monthPicker.year}}</button>\n" +
-    "    <button type=\"button\" ng-click=\"nextYear()\"><kt-date-picker-next-icon></kt-date-picker-next-icon></button>\n" +
+    "    <button type=\"button\" ng-click=\"previousYear()\" ng-disabled=\"!hasPreviousYear()\"><kt-date-picker-previous-icon></kt-date-picker-previous-icon></button>\n" +
+    "    <button type=\"button\" ng-click=\"yearClick()\" ng-disabled=\"!canChooseYear()\">{{monthPicker.year}}</button>\n" +
+    "    <button type=\"button\" ng-click=\"nextYear()\" ng-disabled=\"!hasNextYear()\"><kt-date-picker-next-icon></kt-date-picker-next-icon></button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-date-picker-content\">\n" +
     "    <div class=\"kt-month-picker-cell\"\n" +
     "         ng-repeat=\"month in monthPicker.months\"\n" +
     "         ng-class=\"{'kt-date-picker-selected': isSelected(month)}\">\n" +
-    "      <button type=\"button\" ng-click=\"selectMonth(month)\">{{month | monthFormat}}</button>\n" +
+    "      <button type=\"button\" ng-click=\"selectMonth(month)\" ng-disabled=\"!isInMinMaxRange(month)\">{{month | monthFormat}}</button>\n" +
     "    </div>\n" +
     "  </div>\n" +
     "  <div class=\"kt-date-picker-footer\"></div>\n" +
@@ -696,15 +804,15 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
   $templateCache.put("html/kt-year-picker.html",
     "<div>\n" +
     "  <div class=\"kt-date-picker-header\">\n" +
-    "    <button type=\"button\" ng-click=\"previousDecade()\"><kt-date-picker-previous-icon></kt-date-picker-previous-icon></button>\n" +
+    "    <button type=\"button\" ng-click=\"previousDecade()\" ng-disabled=\"!hasPreviousDecade()\"><kt-date-picker-previous-icon></kt-date-picker-previous-icon></button>\n" +
     "    <button type=\"button\" disabled=\"disabled\">{{yearPicker.decade.start}} - {{yearPicker.decade.end}}</button>\n" +
-    "    <button type=\"button\" ng-click=\"nextDecade()\"><kt-date-picker-next-icon></kt-date-picker-next-icon></button>\n" +
+    "    <button type=\"button\" ng-click=\"nextDecade()\" ng-disabled=\"!hasNextDecade()\"><kt-date-picker-next-icon></kt-date-picker-next-icon></button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-date-picker-content\">\n" +
     "    <div class=\"kt-year-picker-cell\"\n" +
     "         ng-repeat=\"year in yearPicker.years\"\n" +
     "         ng-class=\"{'kt-date-picker-selected': isSelected(year), 'kt-date-picker-overflow': isOverflowing(year)}\">\n" +
-    "      <button type=\"button\" ng-click=\"selectYear(year)\">{{year}}</button>\n" +
+    "      <button type=\"button\" ng-click=\"selectYear(year)\" ng-disabled=\"!isInMinMaxRange(year)\">{{year}}</button>\n" +
     "    </div>\n" +
     "  </div>\n" +
     "  <div class=\"kt-date-picker-footer\"></div>\n" +

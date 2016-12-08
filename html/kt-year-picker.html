@@ -1,14 +1,14 @@
 <div>
   <div class="kt-date-picker-header">
-    <button type="button" ng-click="previousDecade()"><kt-date-picker-previous-icon></kt-date-picker-previous-icon></button>
+    <button type="button" ng-click="previousDecade()" ng-disabled="!hasPreviousDecade()"><kt-date-picker-previous-icon></kt-date-picker-previous-icon></button>
     <button type="button" disabled="disabled">{{yearPicker.decade.start}} - {{yearPicker.decade.end}}</button>
-    <button type="button" ng-click="nextDecade()"><kt-date-picker-next-icon></kt-date-picker-next-icon></button>
+    <button type="button" ng-click="nextDecade()" ng-disabled="!hasNextDecade()"><kt-date-picker-next-icon></kt-date-picker-next-icon></button>
   </div>
   <div class="kt-date-picker-content">
     <div class="kt-year-picker-cell"
          ng-repeat="year in yearPicker.years"
          ng-class="{'kt-date-picker-selected': isSelected(year), 'kt-date-picker-overflow': isOverflowing(year)}">
-      <button type="button" ng-click="selectYear(year)">{{year}}</button>
+      <button type="button" ng-click="selectYear(year)" ng-disabled="!isInMinMaxRange(year)">{{year}}</button>
     </div>
   </div>
   <div class="kt-date-picker-footer"></div>

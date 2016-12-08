@@ -1,8 +1,8 @@
 <div>
   <div class="kt-date-picker-header">
-    <button type="button" ng-click="previousMonth()"><kt-date-picker-previous-icon></kt-date-picker-previous-icon></button>
-    <button type="button" ng-click="monthClick()">{{dayPicker.month | monthFormat}} {{dayPicker.year}}</button>
-    <button type="button" ng-click="nextMonth()"><kt-date-picker-next-icon></kt-date-picker-next-icon></button>
+    <button type="button" ng-click="previousMonth()" ng-disabled="!hasPreviousMonth()"><kt-date-picker-previous-icon></kt-date-picker-previous-icon></button>
+    <button type="button" ng-click="monthClick()" ng-disabled="!canChooseMonth()">{{dayPicker.month | monthFormat}} {{dayPicker.year}}</button>
+    <button type="button" ng-click="nextMonth()" ng-disabled="!hasNextMonth()"><kt-date-picker-next-icon></kt-date-picker-next-icon></button>
   </div>
   <div class="kt-date-picker-content">
     <div class="kt-day-picker-row">
@@ -14,7 +14,7 @@
       <div class="kt-day-picker-cell"
            ng-repeat="date in week.dates"
            ng-class="{'kt-date-picker-selected': isSelected(date), 'kt-date-picker-overflow': isOverflowing(date)}">
-        <button type="button" ng-click="selectDate(date)">
+        <button type="button" ng-click="selectDate(date)" ng-disabled="!isInMinMaxRange(date)">
           {{date.format('D')}}
         </button>
       </div>

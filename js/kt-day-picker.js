@@ -78,33 +78,30 @@
     return service;
   }]);
 
-  dayPicker.directive('ktDayPicker', ['ktDayPickerSvc', function (service) {
+  dayPicker.directive('ktDayPicker', ['ktDayPickerSvc', 'ktDatePickerService', function (dayPickerService, datePickerService) {
     return {
       restrict: 'E',
       templateUrl: 'html/kt-day-picker.html',
       scope: {
-        date: '='
+        date: '=',
+        minDate: '=',
+        maxDate: '='
       },
       link: function (scope) {
         scope.dayPicker = {
           month: undefined,
           year: undefined,
           weeks: undefined,
-          dayHeaders: service.getDayHeaders()
+          dayHeaders: dayPickerService.getDayHeaders()
         };
 
-        scope.$watch('date', function (date) {
-          if (!date) {
-            date = moment().clone();
-          }
+        scope.date = datePickerService.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate, 'day', '[]');
 
+        scope.$watch('date', function (date) {
           resetDayPicker(date);
         }, true);
 
         scope.selectDate = function (date) {
-          if (!scope.date) {
-            scope.date = date.clone();
-          }
           scope.date.year(date.year()).month(date.month()).date(date.date());
 
           var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
@@ -120,10 +117,22 @@
           resetDayPicker(date);
         };
 
+        scope.hasPreviousMonth = function () {
+          var date = moment({year: scope.dayPicker.year, month: scope.dayPicker.month});
+          date.subtract(1, 'months');
+          return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', []);
+        };
+
         scope.nextMonth = function () {
           var date = moment({year: scope.dayPicker.year, month: scope.dayPicker.month});
           date.add(1, 'months');
           resetDayPicker(date);
+        };
+
+        scope.hasNextMonth = function () {
+          var date = moment({year: scope.dayPicker.year, month: scope.dayPicker.month});
+          date.add(1, 'months');
+          return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', []);
         };
 
         scope.isSelected = function (date) {
@@ -140,12 +149,26 @@
           return date.month() !== scope.dayPicker.month;
         };
 
+        scope.isInMinMaxRange = function (date) {
+          return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'day', '[]');
+        };
+
         scope.monthClick = function () {
           var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
 
           if (parentElement && parentElement.prop('tagName').toLowerCase() === 'kt-date-picker') {
             scope.$emit('dayPicker:monthClick');
           }
+        };
+
+        scope.canChooseMonth = function () {
+          var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
+
+          if (parentElement && parentElement.prop('tagName').toLowerCase() === 'kt-date-picker' && (scope.hasPreviousMonth() || scope.hasNextMonth())) {
+            return true;
+          }
+
+          return false;
         };
 
 
@@ -161,7 +184,7 @@
 
           scope.dayPicker.month = date.month();
           scope.dayPicker.year = date.year();
-          scope.dayPicker.weeks = service.getWeeksInMonth(scope.dayPicker.year, scope.dayPicker.month);
+          scope.dayPicker.weeks = dayPickerService.getWeeksInMonth(scope.dayPicker.year, scope.dayPicker.month);
         }
       }
     };
