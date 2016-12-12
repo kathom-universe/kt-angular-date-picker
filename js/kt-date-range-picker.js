@@ -33,6 +33,10 @@
         scope.isCurrentPicker = function (picker) {
           return currentPicker === picker;
         };
+
+        scope.setCurrentPicker = function (picker) {
+          currentPicker = picker;
+        }
       }
     };
   }]);

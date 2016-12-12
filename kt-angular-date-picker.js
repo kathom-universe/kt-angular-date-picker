@@ -159,7 +159,7 @@
   }]);
 
 
-
+
 
   var dateRangePicker = angular.module('kt.datePicker');
 
@@ -193,6 +193,10 @@
         scope.isCurrentPicker = function (picker) {
           return currentPicker === picker;
         };
+
+        scope.setCurrentPicker = function (picker) {
+          currentPicker = picker;
+        }
       }
     };
   }]);
@@ -726,10 +730,9 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
   $templateCache.put("html/kt-date-range-picker.html",
     "<div>\n" +
     "    <div class=\"kt-date-range-picker-header\" style=\"display: table; width: 100%\">\n" +
-    "        {{startDate.format('DD.MM.YYYY')}} - {{endDate.format('DD.MM.YYYY')}}\n" +
+    "        <button ng-click=\"setCurrentPicker('start')\" ng-class=\"{'kt-date-range-picker-active-range': isCurrentPicker('start')}\">{{startDate.format('DD.MM.YYYY')}}</button>\n" +
+    "        <button ng-click=\"setCurrentPicker('end')\" ng-class=\"{'kt-date-range-picker-active-range': isCurrentPicker('end')}\">{{endDate.format('DD.MM.YYYY')}}</button>\n" +
     "    </div>\n" +
-    "    {{ isCurrentPicker('start') }}\n" +
-    "    {{ isCurrentPicker('end') }}\n" +
     "    <kt-date-picker date=\"$parent.startDate\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" ng-if=\"isCurrentPicker('start')\"></kt-date-picker>\n" +
     "    <kt-date-picker date=\"$parent.endDate\" min-date=\"$parent.startDate\" max-date=\"$parent.maxDate\" ng-if=\"isCurrentPicker('end')\"></kt-date-picker>\n" +
     "</div>");

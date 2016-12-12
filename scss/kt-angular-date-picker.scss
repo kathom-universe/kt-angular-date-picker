@@ -76,7 +76,7 @@ $kt-time-picker-width: 15rem;
   }
 }
 
-.kt-date-picker-header {
+.kt-date-picker-header, .kt-date-range-picker-header {
   display : table;
   width   : 100%;
 
@@ -86,22 +86,36 @@ $kt-time-picker-width: 15rem;
     height         : $kt-date-picker-header-height;
     font-size      : $kt-date-picker-header-font-size;
   }
+}
 
+.kt-date-picker-header {
   button:first-of-type, button:last-of-type {
     width     : 20%;
     font-size : $kt-date-picker-previous-next-font-size;
   }
 
   button:nth-of-type(2) {
-    width     : 60%;
+    width : 60%;
+  }
+}
+
+.kt-date-range-picker-header {
+  button {
+    width         : 50%;
+    margin-bottom : 1rem;
+    border-bottom : 5px solid transparent;
+
+    &.kt-date-range-picker-active-range {
+      border-bottom-color : $kt-date-picker-active-date-background;
+    }
   }
 }
 
 .kt-date-picker-footer {
-  height: $kt-date-picker-footer-height;
+  height : $kt-date-picker-footer-height;
 }
 
-kt-date-picker, kt-day-picker, kt-month-picker, kt-year-picker, kt-time-picker {
+kt-date-picker, kt-day-picker, kt-month-picker, kt-year-picker, kt-time-picker, kt-date-range-picker {
   display     : block;
   width       : $kt-date-picker-width;
   font-family : $kt-date-picker-font-family;
@@ -126,6 +140,11 @@ kt-date-picker {
   .kt-date-picker-content {
     height : $kt-date-picker-content-height;
   }
+}
+
+kt-date-range-picker kt-date-picker {
+  width   : 100%;
+  padding : 0;
 }
 
 kt-day-picker {

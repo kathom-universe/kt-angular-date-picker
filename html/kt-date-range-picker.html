@@ -1,9 +1,8 @@
 <div>
     <div class="kt-date-range-picker-header" style="display: table; width: 100%">
-        {{startDate.format('DD.MM.YYYY')}} - {{endDate.format('DD.MM.YYYY')}}
+        <button ng-click="setCurrentPicker('start')" ng-class="{'kt-date-range-picker-active-range': isCurrentPicker('start')}">{{startDate.format('DD.MM.YYYY')}}</button>
+        <button ng-click="setCurrentPicker('end')" ng-class="{'kt-date-range-picker-active-range': isCurrentPicker('end')}">{{endDate.format('DD.MM.YYYY')}}</button>
     </div>
-    {{ isCurrentPicker('start') }}
-    {{ isCurrentPicker('end') }}
     <kt-date-picker date="$parent.startDate" min-date="$parent.minDate" max-date="$parent.maxDate" ng-if="isCurrentPicker('start')"></kt-date-picker>
     <kt-date-picker date="$parent.endDate" min-date="$parent.startDate" max-date="$parent.maxDate" ng-if="isCurrentPicker('end')"></kt-date-picker>
 </div>
