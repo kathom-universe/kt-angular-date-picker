@@ -158,7 +158,12 @@
     };
   }]);
 
-  datePicker.directive('ktDateRangePicker', ['ktDatePickerService',  function (datePickerService) {
+
+
+
+  var dateRangePicker = angular.module('kt.datePicker');
+
+  dateRangePicker.directive('ktDateRangePicker', ['ktDatePickerService',  function (datePickerService) {
     return {
       restrict: 'E',
       scope: {
@@ -191,7 +196,6 @@
       }
     };
   }]);
-
 
 
 

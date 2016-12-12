@@ -70,6 +70,7 @@ module.exports = function(grunt) {
             'bower_components/kt-angular-util/kt-angular-util.js',
             'bower_components/kt-angular-dropdown/kt-angular-dropdown.js',
             'js/kt-date-picker.js',
+            'js/kt-date-range-picker.js',
             'js/kt-date-picker-util.js',
             'js/kt-day-picker.js',
             'js/kt-month-picker.js',

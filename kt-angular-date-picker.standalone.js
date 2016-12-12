@@ -1,5 +1,6 @@
 (function (){
-  'use strict';
+  'use strict';
+
 
   angular.module('kt.util', [
     'kt.util.dom',
@@ -154,7 +155,8 @@
 
 
 
-
+
+
 
   var dropdown = angular.module('kt.dropdown', ['kt.util.dom']);
 
@@ -409,7 +411,13 @@
     };
   }]);
 
-  datePicker.directive('ktDateRangePicker', ['ktDatePickerService',  function (datePickerService) {
+
+
+
+
+  var dateRangePicker = angular.module('kt.datePicker');
+
+  dateRangePicker.directive('ktDateRangePicker', ['ktDatePickerService',  function (datePickerService) {
     return {
       restrict: 'E',
       scope: {
@@ -442,7 +450,6 @@
       }
     };
   }]);
-
 
 
 
@@ -804,7 +811,8 @@
   }]);
 
 
-
+
+
 
   var timePicker = angular.module('kt.datePicker');
 
