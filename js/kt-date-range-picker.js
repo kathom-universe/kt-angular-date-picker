@@ -21,7 +21,7 @@
         scope.endDate =  datePickerService.getDateWithinBounds(scope.endDate, scope.minDate, scope.maxDate);
 
         scope.$watch('startDate', function (startDate) {
-          scope.endDate = datePickerService.getDateWithinBounds(scope.endDate, startDate, scope.maxDate);
+          scope.endDate = datePickerService.getDateWithinBounds(scope.endDate, startDate, scope.maxDate, 'day', '[]');
         }, true);
 
         scope.$on('datePicker:dateSelect', function (ev) {
@@ -37,6 +37,61 @@
         scope.setCurrentPicker = function (picker) {
           currentPicker = picker;
         }
+      }
+    };
+  }]);
+
+  dateRangePicker.directive('ktDateRangePickerInput', ['ktDatePickerService', function (datePickerService) {
+    var instanceCount = 0;
+
+    return {
+      restrict: 'E',
+      scope: {
+        startDate: '=',
+        endDate: '=',
+        minDate: '=',
+        maxDate: '=',
+        format: '@',
+        divider: '@'
+      },
+      template:
+      '<input type="text" ng-model="dateRangeString" ng-change="dateRangeStringChanged()" kt-dropdown=".ktDateRangePickerInput_{{instanceCount}}">' +
+      '<kt-date-range-picker class="ktDateRangePickerInput_{{instanceCount}}" start-date="startDate" end-date="endDate" min-date="minDate" max-date="maxDate"></kt-date-range-picker>',
+      link: function (scope) {
+        scope.instanceCount = instanceCount++;
+        scope.dateRangeString = '';
+
+        scope.startDate =  datePickerService.getDateWithinBounds(scope.startDate, scope.minDate, scope.maxDate);
+        scope.endDate =  datePickerService.getDateWithinBounds(scope.endDate, scope.minDate, scope.maxDate);
+
+        scope.$watch('[startDate, endDate]', function (dates) {
+          scope.dateRangeString = dates[0].format(scope.format) + scope.divider + dates[1].format(scope.format);
+        }, true);
+
+        scope.dateRangeStringChanged = function () {
+          var dates = scope.dateRangeString.split(scope.divider);
+
+          if (dates.length !== 2) {
+            return;
+          }
+
+          var startDate = moment(dates[0], scope.format, true);
+          var endDate = moment(dates[1], scope.format, true);
+
+          if (!startDate.isValid() || !endDate.isValid()) {
+            return;
+          }
+
+          if (
+            !datePickerService.isDateWithinBounds(startDate, scope.minDate, scope.maxDate, null, '[]') ||
+            !datePickerService.isDateWithinBounds(endDate, startDate, scope.maxDate, null, '[]')
+          ) {
+            return;
+          }
+
+          scope.startDate.year(startDate.year()).month(startDate.month()).date(startDate.date());
+          scope.endDate.year(endDate.year()).month(endDate.month()).date(endDate.date());
+        };
       }
     };
   }]);

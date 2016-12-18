@@ -21,7 +21,7 @@
     var service = {};
 
     service.isDateWithinBounds = function (date, minDate, maxDate, precision, inclusivity) {
-      if (minDate && maxDate && minDate.isAfter(maxDate)) {
+      if (minDate && maxDate && minDate.isAfter(maxDate, precision)) {
         return true;
       }
 
