@@ -18,6 +18,6 @@
     "moment": "^2.14.1",
     "angular": "^1.5.8",
     "kt-angular-util": "^0.0.2",
-    "kt-angular-dropdown": "^0.0.1"
+    "kt-angular-dropdown": "^0.0.2"
   }
 }

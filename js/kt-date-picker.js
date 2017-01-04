@@ -11,10 +11,7 @@
         minDate: '=',
         maxDate: '='
       },
-      template:
-      '<kt-day-picker date="$parent.date" min-date="$parent.minDate" max-date="$parent.maxDate" ng-if="isCurrentPicker(\'day\')"></kt-day-picker>' +
-      '<kt-month-picker date="$parent.date" min-date="$parent.minDate" max-date="$parent.maxDate" ng-if="isCurrentPicker(\'month\')"></kt-month-picker>' +
-      '<kt-year-picker date="$parent.date" min-date="$parent.minDate" max-date="$parent.maxDate" ng-if="isCurrentPicker(\'year\')"></kt-year-picker> ',
+      templateUrl: 'html/kt-date-picker.html',
       link: function (scope, element) {
         scope.element = element;
         var currentPicker = 'day';
@@ -71,9 +68,7 @@
         maxDate: '=',
         format: '@'
       },
-      template:
-        '<input type="text" ng-model="dateString" ng-change="dateStringChanged()" kt-dropdown=".ktDatePickerInput_{{instanceCount}}">' +
-        '<kt-date-picker class="ktDatePickerInput_{{instanceCount}}" date="date" min-date="minDate" max-date="maxDate"></kt-date-picker>',
+      templateUrl: 'html/kt-date-picker-input.html',
       link: function (scope) {
         scope.instanceCount = instanceCount++;
         scope.dateString = '';

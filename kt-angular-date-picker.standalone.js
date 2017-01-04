@@ -1,7 +1,6 @@
 (function (){
   'use strict';
 
-
   angular.module('kt.util', [
     'kt.util.dom',
     'kt.util.style'
@@ -152,7 +151,6 @@
       }
     };
   }]);
-
 
 
 
@@ -315,7 +313,6 @@
 
 
 
-
   var datePicker = angular.module('kt.datePicker', ['kt.util.style', 'kt.dropdown']);
 
   datePicker.directive('ktDatePicker', [function () {
@@ -326,10 +323,7 @@
         minDate: '=',
         maxDate: '='
       },
-      template:
-      '<kt-day-picker date="$parent.date" min-date="$parent.minDate" max-date="$parent.maxDate" ng-if="isCurrentPicker(\'day\')"></kt-day-picker>' +
-      '<kt-month-picker date="$parent.date" min-date="$parent.minDate" max-date="$parent.maxDate" ng-if="isCurrentPicker(\'month\')"></kt-month-picker>' +
-      '<kt-year-picker date="$parent.date" min-date="$parent.minDate" max-date="$parent.maxDate" ng-if="isCurrentPicker(\'year\')"></kt-year-picker> ',
+      templateUrl: 'html/kt-date-picker.html',
       link: function (scope, element) {
         scope.element = element;
         var currentPicker = 'day';
@@ -386,9 +380,7 @@
         maxDate: '=',
         format: '@'
       },
-      template:
-        '<input type="text" ng-model="dateString" ng-change="dateStringChanged()" kt-dropdown=".ktDatePickerInput_{{instanceCount}}">' +
-        '<kt-date-picker class="ktDatePickerInput_{{instanceCount}}" date="date" min-date="minDate" max-date="maxDate"></kt-date-picker>',
+      templateUrl: 'html/kt-date-picker-input.html',
       link: function (scope) {
         scope.instanceCount = instanceCount++;
         scope.dateString = '';
@@ -411,7 +403,6 @@
       }
     };
   }]);
-
 
 
 
@@ -469,9 +460,7 @@
         format: '@',
         divider: '@'
       },
-      template:
-      '<input type="text" ng-model="dateRangeString" ng-change="dateRangeStringChanged()" kt-dropdown=".ktDateRangePickerInput_{{instanceCount}}">' +
-      '<kt-date-range-picker class="ktDateRangePickerInput_{{instanceCount}}" start-date="startDate" end-date="endDate" min-date="minDate" max-date="maxDate"></kt-date-range-picker>',
+      templateUrl: 'html/kt-date-range-picker-input.html',
       link: function (scope) {
         scope.instanceCount = instanceCount++;
         scope.dateRangeString = '';
@@ -572,7 +561,6 @@
 
     return service;
   });
-
 
 
 
@@ -768,7 +756,6 @@
 
 
 
-
   var monthPicker = angular.module('kt.datePicker');
 
   monthPicker.directive('ktMonthPicker', ['ktDatePickerService', function (datePickerService) {
@@ -872,7 +859,6 @@
       }
     };
   }]);
-
 
 
 
@@ -995,7 +981,6 @@
 
 
 
-
   var yearPicker = angular.module('kt.datePicker');
 
   yearPicker.directive('ktYearPicker', ['ktDatePickerService', function (datePickerService) {
@@ -1103,6 +1088,25 @@
 
 
 angular.module('kt.datePicker').run(['$templateCache', function($templateCache) {
+  $templateCache.put("html/kt-date-picker-input.html",
+    "<div>\n" +
+    "  <input type=\"text\" ng-model=\"dateString\" ng-change=\"dateStringChanged()\" kt-dropdown=\".ktDatePickerInput_{{instanceCount}}\">\n" +
+    "  <kt-date-picker class=\"ktDatePickerInput_{{instanceCount}} kt-dropdown-target\" date=\"date\" min-date=\"minDate\" max-date=\"maxDate\"></kt-date-picker>\n" +
+    "</div>\n" +
+    "");
+  $templateCache.put("html/kt-date-picker.html",
+    "<div>\n" +
+    "  <kt-day-picker date=\"$parent.date\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" ng-if=\"isCurrentPicker('day')\"></kt-day-picker>\n" +
+    "  <kt-month-picker date=\"$parent.date\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" ng-if=\"isCurrentPicker('month')\"></kt-month-picker>\n" +
+    "  <kt-year-picker date=\"$parent.date\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" ng-if=\"isCurrentPicker('year')\"></kt-year-picker>\n" +
+    "</div>\n" +
+    "");
+  $templateCache.put("html/kt-date-range-picker-input.html",
+    "<div>\n" +
+    "  <input type=\"text\" ng-model=\"dateRangeString\" ng-change=\"dateRangeStringChanged()\" kt-dropdown=\".ktDateRangePickerInput_{{instanceCount}}\">\n" +
+    "  <kt-date-range-picker class=\"ktDateRangePickerInput_{{instanceCount}} kt-dropdown-target\" start-date=\"startDate\" end-date=\"endDate\" min-date=\"minDate\" max-date=\"maxDate\"></kt-date-range-picker>\n" +
+    "</div>\n" +
+    "");
   $templateCache.put("html/kt-date-range-picker.html",
     "<div>\n" +
     "    <div class=\"kt-date-range-picker-header\" style=\"display: table; width: 100%\">\n" +

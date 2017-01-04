@@ -54,9 +54,7 @@
         format: '@',
         divider: '@'
       },
-      template:
-      '<input type="text" ng-model="dateRangeString" ng-change="dateRangeStringChanged()" kt-dropdown=".ktDateRangePickerInput_{{instanceCount}}">' +
-      '<kt-date-range-picker class="ktDateRangePickerInput_{{instanceCount}}" start-date="startDate" end-date="endDate" min-date="minDate" max-date="maxDate"></kt-date-range-picker>',
+      templateUrl: 'html/kt-date-range-picker-input.html',
       link: function (scope) {
         scope.instanceCount = instanceCount++;
         scope.dateRangeString = '';
