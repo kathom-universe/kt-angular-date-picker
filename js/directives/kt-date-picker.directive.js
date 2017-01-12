@@ -59,7 +59,7 @@
       }
     }])
 
-    .directive('ktDatePickerInput', ['ktDatePickerService', function (datePickerService) {
+    .directive('ktDatePickerInput', ['ktDateBoundsService', function (ktDateBounds) {
       var instanceCount = 0;
 
       return {
@@ -75,7 +75,7 @@
           scope.instanceCount = instanceCount++;
           scope.dateString = '';
 
-          scope.date = datePickerService.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate);
+          scope.date = ktDateBounds.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate);
 
           scope.$watch('date', function (date) {
             scope.dateString = date.format(scope.format);
@@ -84,7 +84,7 @@
           scope.dateStringChanged = function () {
             var date = moment(scope.dateString, scope.format, true);
 
-            if (!date.isValid() || !datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, null, '[]')) {
+            if (!date.isValid() || !ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, null, '[]')) {
               return;
             }
 

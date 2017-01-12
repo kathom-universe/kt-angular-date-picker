@@ -3,7 +3,7 @@
 
   var dateRangePicker = angular.module('kt.datePicker');
 
-  dateRangePicker.directive('ktDateRangePicker', ['ktDatePickerService',  function (datePickerService) {
+  dateRangePicker.directive('ktDateRangePicker', ['ktDateBoundsService',  function (ktDateBounds) {
     return {
       restrict: 'E',
       scope: {
@@ -17,11 +17,11 @@
         scope.element = element;
         var currentPicker = 'start';
 
-        scope.startDate =  datePickerService.getDateWithinBounds(scope.startDate, scope.minDate, scope.maxDate);
-        scope.endDate =  datePickerService.getDateWithinBounds(scope.endDate, scope.minDate, scope.maxDate);
+        scope.startDate =  ktDateBounds.getDateWithinBounds(scope.startDate, scope.minDate, scope.maxDate);
+        scope.endDate =  ktDateBounds.getDateWithinBounds(scope.endDate, scope.minDate, scope.maxDate);
 
         scope.$watch('startDate', function (startDate) {
-          scope.endDate = datePickerService.getDateWithinBounds(scope.endDate, startDate, scope.maxDate, 'day', '[]');
+          scope.endDate = ktDateBounds.getDateWithinBounds(scope.endDate, startDate, scope.maxDate, 'day', '[]');
         }, true);
 
         scope.$on('datePicker:dateSelect', function (ev) {
@@ -41,7 +41,7 @@
     };
   }]);
 
-  dateRangePicker.directive('ktDateRangePickerInput', ['ktDatePickerService', function (datePickerService) {
+  dateRangePicker.directive('ktDateRangePickerInput', ['ktDateBoundsService', function (ktDateBounds) {
     var instanceCount = 0;
 
     return {
@@ -59,8 +59,8 @@
         scope.instanceCount = instanceCount++;
         scope.dateRangeString = '';
 
-        scope.startDate =  datePickerService.getDateWithinBounds(scope.startDate, scope.minDate, scope.maxDate);
-        scope.endDate =  datePickerService.getDateWithinBounds(scope.endDate, scope.minDate, scope.maxDate);
+        scope.startDate =  ktDateBounds.getDateWithinBounds(scope.startDate, scope.minDate, scope.maxDate);
+        scope.endDate =  ktDateBounds.getDateWithinBounds(scope.endDate, scope.minDate, scope.maxDate);
 
         scope.$watch('[startDate, endDate]', function (dates) {
           scope.dateRangeString = dates[0].format(scope.format) + scope.divider + dates[1].format(scope.format);
@@ -81,8 +81,8 @@
           }
 
           if (
-            !datePickerService.isDateWithinBounds(startDate, scope.minDate, scope.maxDate, null, '[]') ||
-            !datePickerService.isDateWithinBounds(endDate, startDate, scope.maxDate, null, '[]')
+            !ktDateBounds.isDateWithinBounds(startDate, scope.minDate, scope.maxDate, null, '[]') ||
+            !ktDateBounds.isDateWithinBounds(endDate, startDate, scope.maxDate, null, '[]')
           ) {
             return;
           }

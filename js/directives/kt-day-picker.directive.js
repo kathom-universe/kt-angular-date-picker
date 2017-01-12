@@ -5,7 +5,7 @@
 
     .module('kt.datePicker')
 
-    .directive('ktDayPicker', ['ktDayPickerSvc', 'ktDatePickerService', function (dayPickerService, datePickerService) {
+    .directive('ktDayPicker', ['ktDayPickerSvc', 'ktDateBoundsService', function (dayPickerService, ktDateBounds) {
       return {
         restrict   : 'E',
         templateUrl: 'html/kt-day-picker.html',
@@ -22,7 +22,7 @@
             dayHeaders: dayPickerService.getDayHeaders()
           };
 
-          scope.date = datePickerService.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate, 'day', '[]');
+          scope.date = ktDateBounds.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate, 'day', '[]');
 
           scope.$watch('date', function (date) {
             resetDayPicker(date);
@@ -47,7 +47,7 @@
           scope.hasPreviousMonth = function () {
             var date = moment({year: scope.dayPicker.year, month: scope.dayPicker.month});
             date.subtract(1, 'months');
-            return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', []);
+            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', []);
           };
 
           scope.nextMonth = function () {
@@ -59,7 +59,7 @@
           scope.hasNextMonth = function () {
             var date = moment({year: scope.dayPicker.year, month: scope.dayPicker.month});
             date.add(1, 'months');
-            return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', []);
+            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', []);
           };
 
           scope.isSelected = function (date) {
@@ -77,7 +77,7 @@
           };
 
           scope.isInMinMaxRange = function (date) {
-            return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'day', '[]');
+            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'day', '[]');
           };
 
           scope.monthClick = function () {

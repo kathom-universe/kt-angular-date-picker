@@ -3,7 +3,7 @@
 
   angular.module('kt.datePicker')
 
-    .directive('ktMonthPicker', ['ktDatePickerService', function (datePickerService) {
+    .directive('ktMonthPicker', ['ktDateBoundsService', function (ktDateBounds) {
       var months;
 
       function getMonths() {
@@ -18,7 +18,7 @@
       }
 
       function getDateWithinBounds(date, minDate, maxDate) {
-        var dateWithinBounds = datePickerService.getDateWithinBounds(date, minDate, maxDate, 'day', '[]');
+        var dateWithinBounds = ktDateBounds.getDateWithinBounds(date, minDate, maxDate, 'day', '[]');
       }
 
       return {
@@ -35,7 +35,7 @@
             months: getMonths()
           };
 
-          scope.date = datePickerService.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate, 'month', '[]');
+          scope.date = ktDateBounds.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate, 'month', '[]');
 
           scope.$watch('date', function (date) {
             scope.monthPicker.year = date.year();
@@ -47,11 +47,11 @@
 
           scope.isInMinMaxRange = function (month) {
             var date = moment().clone().year(scope.monthPicker.year).month(month);
-            return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', '[]');
+            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', '[]');
           };
 
           scope.selectMonth = function (month) {
-            var date = datePickerService.getDateWithinBounds(
+            var date = ktDateBounds.getDateWithinBounds(
               scope.date.clone().year(scope.monthPicker.year).month(month), scope.minDate, scope.maxDate, 'day', [], 'month'
             );
 
@@ -71,7 +71,7 @@
           scope.hasPreviousYear = function () {
             var date = moment({year: scope.monthPicker.year});
             date.subtract(1, 'year');
-            return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', []);
+            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', []);
           };
 
           scope.nextYear = function () {
@@ -81,7 +81,7 @@
           scope.hasNextYear = function () {
             var date = moment({year: scope.monthPicker.year});
             date.add(1, 'year');
-            return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', []);
+            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', []);
           };
 
           scope.yearClick = function () {

@@ -5,7 +5,7 @@
 
     .module('kt.datePicker')
 
-    .directive('ktYearPicker', ['ktDatePickerService', function (datePickerService) {
+    .directive('ktYearPicker', ['ktDateBoundsService', function (ktDateBounds) {
       function getDecade(year) {
         var start = year - year % 10;
         var end = start + 9;
@@ -42,7 +42,7 @@
             years : getYears(decade)
           };
 
-          scope.date = datePickerService.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate, 'year', '[]');
+          scope.date = ktDateBounds.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate, 'year', '[]');
 
           scope.$watch('date', function (date) {
             if (scope.yearPicker.years.indexOf(date.year()) === -1) {
@@ -52,7 +52,7 @@
           }, true);
 
           scope.selectYear = function (year) {
-            var date = datePickerService.getDateWithinBounds(
+            var date = ktDateBounds.getDateWithinBounds(
               scope.date.clone().year(year), scope.minDate, scope.maxDate, 'day', [], 'year'
             );
 
@@ -73,7 +73,7 @@
           scope.hasPreviousDecade = function () {
             var date = moment().clone().year(scope.yearPicker.years[0]);
             date.subtract(1, 'years');
-            return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', '[]');
+            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', '[]');
           };
 
           scope.nextDecade = function () {
@@ -85,7 +85,7 @@
           scope.hasNextDecade = function () {
             var date = moment().clone().year(scope.yearPicker.years[0]);
             date.add(10, 'years');
-            return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', '[]');
+            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', '[]');
           };
 
           scope.isSelected = function (year) {
@@ -102,7 +102,7 @@
 
           scope.isInMinMaxRange = function (year) {
             var date = moment().clone().year(year);
-            return datePickerService.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', '[]')
+            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'year', '[]')
           };
         }
       };
