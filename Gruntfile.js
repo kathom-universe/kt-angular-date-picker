@@ -63,19 +63,19 @@ module.exports = function(grunt) {
         },
         files: {
           'kt-angular-date-picker.js': [
-            'js/*.js',
+            'js/kt-date-picker.module.js',
+            'js/services/*.js',
+            'js/filters/*.js',
+            'js/directives/*.js',
             'js/template/template-cache.js'
           ],
           'kt-angular-date-picker.standalone.js': [
             'bower_components/kt-angular-util/kt-angular-util.js',
             'bower_components/kt-angular-dropdown/kt-angular-dropdown.js',
-            'js/kt-date-picker.js',
-            'js/kt-date-range-picker.js',
-            'js/kt-date-picker-util.js',
-            'js/kt-day-picker.js',
-            'js/kt-month-picker.js',
-            'js/kt-time-picker.js',
-            'js/kt-year-picker.js',
+            'js/kt-date-picker.module.js',
+            'js/services/*.js',
+            'js/filters/*.js',
+            'js/directives/*.js',
             'js/template/template-cache.js'
           ]
         }
