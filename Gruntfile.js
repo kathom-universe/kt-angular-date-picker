@@ -28,10 +28,16 @@ module.exports = function(grunt) {
     },
     watch: {
       css: {
-        files: [
-          'scss/**/*.scss'
-        ],
+        files: ['scss/**/*.scss'],
         tasks: ['build-css']
+      },
+      html: {
+        files: ['html/**/*.html'],
+        tasks: ['html2js']
+      },
+      js: {
+        files: ['js/**/*.js'],
+        tasks: ['concat']
       }
     },
     html2js: {
@@ -90,6 +96,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
 
   grunt.registerTask('build-css', ['sass', 'postcss']);
-  grunt.registerTask('build-template', ['html2js', 'concat']);
   grunt.registerTask('default', ['watch']);
 };
