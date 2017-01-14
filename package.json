@@ -17,14 +17,17 @@
   },
   "homepage": "https://github.com/KathomDev/kt-angular-date-picker#readme",
   "devDependencies": {
-    "autoprefixer": "^6.3.7",
+    "autoprefixer": "^6.6.1",
     "grunt": "^1.0.1",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-html2js": "^0.3.6",
     "grunt-postcss": "^0.8.0",
-    "grunt-sass": "^1.2.0",
+    "grunt-sass": "^1.2.1",
     "jasmine-core": "^2.5.2",
+    "karma": "^1.3.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-firefox-launcher": "^1.0.0",
     "karma-jasmine": "^1.1.0",
     "karma-phantomjs-launcher": "^1.0.2"
   }
