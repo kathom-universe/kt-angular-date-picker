@@ -3,31 +3,32 @@
 
   var dateRangePicker = angular.module('kt.datePicker');
 
-  dateRangePicker.directive('ktDateRangePicker', ['ktDateBoundsService',  function (ktDateBounds) {
+  dateRangePicker.directive('ktDateRangePicker', ['$timeout', 'ktDateBoundsService', function ($timeout, ktDateBounds) {
     return {
-      restrict: 'E',
-      scope: {
+      restrict   : 'E',
+      scope      : {
         startDate: '=',
-        endDate: '=',
-        minDate: '=',
-        maxDate: '='
+        endDate  : '=',
+        minDate  : '=',
+        maxDate  : '=',
+        format   : '@'
       },
       templateUrl: 'html/kt-date-range-picker.html',
-      link: function (scope, element) {
+      link       : function (scope, element) {
         scope.element = element;
         var currentPicker = 'start';
 
-        scope.startDate =  ktDateBounds.getDateWithinBounds(scope.startDate, scope.minDate, scope.maxDate);
-        scope.endDate =  ktDateBounds.getDateWithinBounds(scope.endDate, scope.minDate, scope.maxDate);
-
         scope.$watch('startDate', function (startDate) {
-          scope.endDate = ktDateBounds.getDateWithinBounds(scope.endDate, startDate, scope.maxDate, 'day', '[]');
-        }, true);
+          var date = ktDateBounds.getDateWithinBounds(moment(scope.endDate, scope.format), moment(startDate, scope.format), scope.maxDate, 'day', '[]');
+          scope.endDate = scope.format ? date.format(scope.format) : date;
+        });
 
         scope.$on('datePicker:dateSelect', function (ev) {
           ev.stopPropagation();
 
-          currentPicker = currentPicker === 'start' ? 'end' : 'start';
+          $timeout(function () {
+            currentPicker = currentPicker === 'start' ? 'end' : 'start';
+          }, 0);
         });
 
         scope.isCurrentPicker = function (picker) {
@@ -36,6 +37,10 @@
 
         scope.setCurrentPicker = function (picker) {
           currentPicker = picker;
+        };
+
+        scope.getDisplayedDate = function (date) {
+          return moment(date, scope.format).format('D. MMMM YYYY');
         }
       }
     };

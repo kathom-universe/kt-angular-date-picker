@@ -7,9 +7,9 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "");
   $templateCache.put("html/kt-date-picker.html",
     "<div>\n" +
-    "  <kt-day-picker date=\"$parent.date\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" ng-if=\"isCurrentPicker('day')\"></kt-day-picker>\n" +
-    "  <kt-month-picker date=\"$parent.date\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" ng-if=\"isCurrentPicker('month')\"></kt-month-picker>\n" +
-    "  <kt-year-picker date=\"$parent.date\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" ng-if=\"isCurrentPicker('year')\"></kt-year-picker>\n" +
+    "  <kt-day-picker ng-model=\"$parent.ngModel\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" format=\"{{$parent.format}}\" ng-if=\"isCurrentPicker('day')\"></kt-day-picker>\n" +
+    "  <kt-month-picker ng-model=\"$parent.ngModel\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" format=\"{{$parent.format}}\" ng-if=\"isCurrentPicker('month')\"></kt-month-picker>\n" +
+    "  <kt-year-picker ng-model=\"$parent.ngModel\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" format=\"{{$parent.format}}\" ng-if=\"isCurrentPicker('year')\"></kt-year-picker>\n" +
     "</div>\n" +
     "");
   $templateCache.put("html/kt-date-range-picker-input.html",
@@ -21,11 +21,11 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
   $templateCache.put("html/kt-date-range-picker.html",
     "<div>\n" +
     "    <div class=\"kt-date-range-picker-header\" style=\"display: table; width: 100%\">\n" +
-    "        <button ng-click=\"setCurrentPicker('start')\" ng-class=\"{'kt-date-range-picker-active-range': isCurrentPicker('start')}\">{{startDate.format('DD.MM.YYYY')}}</button>\n" +
-    "        <button ng-click=\"setCurrentPicker('end')\" ng-class=\"{'kt-date-range-picker-active-range': isCurrentPicker('end')}\">{{endDate.format('DD.MM.YYYY')}}</button>\n" +
+    "        <button ng-click=\"setCurrentPicker('start')\" ng-class=\"{'kt-date-range-picker-active-range': isCurrentPicker('start')}\">{{getDisplayedDate(startDate)}}</button>\n" +
+    "        <button ng-click=\"setCurrentPicker('end')\" ng-class=\"{'kt-date-range-picker-active-range': isCurrentPicker('end')}\">{{getDisplayedDate(endDate)}}</button>\n" +
     "    </div>\n" +
-    "    <kt-date-picker date=\"$parent.startDate\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" ng-if=\"isCurrentPicker('start')\"></kt-date-picker>\n" +
-    "    <kt-date-picker date=\"$parent.endDate\" min-date=\"$parent.startDate\" max-date=\"$parent.maxDate\" ng-if=\"isCurrentPicker('end')\"></kt-date-picker>\n" +
+    "    <kt-date-picker ng-model=\"$parent.startDate\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" format=\"{{$parent.format}}\" ng-if=\"isCurrentPicker('start')\"></kt-date-picker>\n" +
+    "    <kt-date-picker ng-model=\"$parent.endDate\" min-date=\"$parent.startDate\" max-date=\"$parent.maxDate\" format=\"{{$parent.format}}\" ng-if=\"isCurrentPicker('end')\"></kt-date-picker>\n" +
     "</div>");
   $templateCache.put("html/kt-day-picker.html",
     "<div>\n" +
@@ -40,7 +40,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "        {{dayHeader}}\n" +
     "      </div>\n" +
     "    </div>\n" +
-    "    <div class=\"kt-day-picker-row\" ng-repeat=\"week in dayPicker.weeks\">\n" +
+    "    <div class=\"kt-day-picker-row kt-day-picker-week\" ng-repeat=\"week in dayPicker.weeks\">\n" +
     "      <div class=\"kt-day-picker-cell\"\n" +
     "           ng-repeat=\"date in week.dates\"\n" +
     "           ng-class=\"{'kt-date-picker-selected': isSelected(date), 'kt-date-picker-overflow': isOverflowing(date)}\">\n" +

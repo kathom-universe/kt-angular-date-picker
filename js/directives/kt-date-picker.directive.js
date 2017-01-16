@@ -9,9 +9,10 @@
       return {
         restrict   : 'E',
         scope      : {
-          date   : '=',
+          ngModel  : '=',
           minDate: '=',
-          maxDate: '='
+          maxDate: '=',
+          format : '@'
         },
         templateUrl: 'html/kt-date-picker.html',
         link       : function (scope, element) {
@@ -27,11 +28,7 @@
           };
 
           scope.$on('dayPicker:daySelect', function (ev) {
-            var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
-
-            if (parentElement && parentElement.prop('tagName').toLowerCase() === 'kt-date-range-picker') {
-              scope.$emit('datePicker:dateSelect');
-            }
+            scope.$emit('datePicker:dateSelect');
 
             ev.stopPropagation();
           });

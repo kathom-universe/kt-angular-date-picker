@@ -23,11 +23,14 @@
 
       service.getWeekRangeForMonth = function (year, month) {
         var date = moment().set({year: year, month: month});
-        var startWeek = date.clone().startOf('month').week();
-        var endWeek = date.clone().endOf('month').week();
+        var start = date.clone().startOf('month');
+        var end = date.clone().endOf('month');
 
-        if (startWeek > endWeek && startWeek < 10) {
-          startWeek = 0;
+        var startWeek = start.week();
+        var endWeek = end.week();
+
+        if (start.weekYear() < end.weekYear()) {
+          startWeek = month === 0 ? 0 : startWeek;
         }
 
         if (startWeek > endWeek && startWeek > 40) {

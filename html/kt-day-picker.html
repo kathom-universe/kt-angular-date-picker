@@ -10,7 +10,7 @@
         {{dayHeader}}
       </div>
     </div>
-    <div class="kt-day-picker-row" ng-repeat="week in dayPicker.weeks">
+    <div class="kt-day-picker-row kt-day-picker-week" ng-repeat="week in dayPicker.weeks">
       <div class="kt-day-picker-cell"
            ng-repeat="date in week.dates"
            ng-class="{'kt-date-picker-selected': isSelected(date), 'kt-date-picker-overflow': isOverflowing(date)}">

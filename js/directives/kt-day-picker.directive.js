@@ -8,13 +8,14 @@
     .directive('ktDayPicker', ['ktDayPickerSvc', 'ktDateBoundsService', function (dayPickerService, ktDateBounds) {
       return {
         restrict   : 'E',
+        require    : 'ngModel',
         templateUrl: 'html/kt-day-picker.html',
         scope      : {
-          date   : '=',
           minDate: '=',
-          maxDate: '='
+          maxDate: '=',
+          format : '@'
         },
-        link       : function (scope) {
+        link       : function (scope, element, attributes, ngModelController) {
           scope.dayPicker = {
             month     : undefined,
             year      : undefined,
@@ -22,20 +23,22 @@
             dayHeaders: dayPickerService.getDayHeaders()
           };
 
-          scope.date = ktDateBounds.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate, 'day', '[]');
+          scope.date = ktDateBounds.getDateWithinBounds(
+            moment(scope.date, scope.format), moment(scope.minDate, scope.format), moment(scope.maxDate, scope.format), 'day', '[]'
+          );
 
-          scope.$watch('date', function (date) {
-            resetDayPicker(date);
-          }, true);
+          scope.$watch(function () {
+            return ngModelController.$modelValue;
+          }, function(newValue) {
+            scope.date = moment(newValue, scope.format);
+            resetDayPicker(scope.date);
+          });
 
           scope.selectDate = function (date) {
             scope.date.year(date.year()).month(date.month()).date(date.date());
+            ngModelController.$setViewValue(scope.format ? scope.date.format(scope.format) : scope.date);
 
-            var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
-
-            if (parentElement && parentElement.prop('tagName').toLowerCase() === 'kt-date-picker') {
-              scope.$emit('dayPicker:daySelect');
-            }
+            scope.$emit('dayPicker:daySelect');
           };
 
           scope.previousMonth = function () {
@@ -45,9 +48,12 @@
           };
 
           scope.hasPreviousMonth = function () {
+            var minDate = scope.minDate ? moment(scope.minDate, scope.format) : undefined;
+            var maxDate = scope.maxDate ? moment(scope.maxDate, scope.format) : undefined;
+
             var date = moment({year: scope.dayPicker.year, month: scope.dayPicker.month});
             date.subtract(1, 'months');
-            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', []);
+            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, 'month', []);
           };
 
           scope.nextMonth = function () {
@@ -57,9 +63,12 @@
           };
 
           scope.hasNextMonth = function () {
+            var minDate = scope.minDate ? moment(scope.minDate, scope.format) : undefined;
+            var maxDate = scope.maxDate ? moment(scope.maxDate, scope.format) : undefined;
+
             var date = moment({year: scope.dayPicker.year, month: scope.dayPicker.month});
             date.add(1, 'months');
-            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'month', []);
+            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, 'month', []);
           };
 
           scope.isSelected = function (date) {
@@ -77,15 +86,14 @@
           };
 
           scope.isInMinMaxRange = function (date) {
-            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, 'day', '[]');
+            var minDate = scope.minDate ? moment(scope.minDate, scope.format) : undefined;
+            var maxDate = scope.maxDate ? moment(scope.maxDate, scope.format) : undefined;
+
+            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, 'day', '[]');
           };
 
           scope.monthClick = function () {
-            var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
-
-            if (parentElement && parentElement.prop('tagName').toLowerCase() === 'kt-date-picker') {
-              scope.$emit('dayPicker:monthClick');
-            }
+            scope.$emit('dayPicker:monthClick');
           };
 
           scope.canChooseMonth = function () {
