@@ -9,18 +9,6 @@
       var service = {};
       var dayHeaders;
 
-      service.getNumberOfWeeksInMonth = function (year, month) {
-        var date = moment().set({year: year, month: month});
-        var startWeek = date.clone().startOf('month').week();
-        var endWeek = date.clone().endOf('month').week();
-
-        if (startWeek > endWeek) {
-          endWeek = startWeek + endWeek;
-        }
-
-        return endWeek - startWeek + 1;
-      };
-
       service.getWeekRangeForMonth = function (year, month) {
         var date = moment().set({year: year, month: month});
         var start = date.clone().startOf('month');
