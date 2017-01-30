@@ -19,7 +19,11 @@
         var currentPicker = 'start';
 
         scope.$watch('startDate', function (startDate) {
-          var date = ktDateBounds.getDateWithinBounds(moment(scope.endDate, scope.format), moment(startDate, scope.format), scope.maxDate, 'day', '[]');
+          var date = ktDateBounds.getMomentWithinBounds(scope.endDate, startDate, scope.maxDate, {
+            precision: 'day',
+            inclusivity: '[]',
+            format: scope.format
+          });
           scope.endDate = scope.format ? date.format(scope.format) : date;
         });
 
@@ -86,8 +90,8 @@
           }
 
           if (
-            !ktDateBounds.isDateWithinBounds(startDate, scope.minDate, scope.maxDate, null, '[]') ||
-            !ktDateBounds.isDateWithinBounds(endDate, startDate, scope.maxDate, null, '[]')
+            !ktDateBounds.isDateWithinBounds(startDate, scope.minDate, scope.maxDate, {inclusivity: '[]'}) ||
+            !ktDateBounds.isDateWithinBounds(endDate, startDate, scope.maxDate, {inclusivity: '[]'})
           ) {
             return;
           }

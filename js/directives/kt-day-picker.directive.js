@@ -23,9 +23,11 @@
             dayHeaders: dayPickerService.getDayHeaders()
           };
 
-          scope.date = ktDateBounds.getDateWithinBounds(
-            moment(scope.date, scope.format), moment(scope.minDate, scope.format), moment(scope.maxDate, scope.format), 'day', '[]'
-          );
+          scope.date = ktDateBounds.getMomentWithinBounds(scope.date, scope.minDate, scope.maxDate, {
+            precision: 'day',
+            inclusivity: '[]',
+            format: scope.format
+          });
 
           scope.$watch(function () {
             return ngModelController.$modelValue;
@@ -53,7 +55,7 @@
 
             var date = moment({year: scope.dayPicker.year, month: scope.dayPicker.month});
             date.subtract(1, 'months');
-            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, 'month', []);
+            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, {precision: 'month', inclusivity: '[]'});
           };
 
           scope.nextMonth = function () {
@@ -68,7 +70,7 @@
 
             var date = moment({year: scope.dayPicker.year, month: scope.dayPicker.month});
             date.add(1, 'months');
-            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, 'month', []);
+            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, {precision: 'month', inclusivity: '[]'});
           };
 
           scope.isSelected = function (date) {
@@ -89,7 +91,7 @@
             var minDate = scope.minDate ? moment(scope.minDate, scope.format) : undefined;
             var maxDate = scope.maxDate ? moment(scope.maxDate, scope.format) : undefined;
 
-            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, 'day', '[]');
+            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, {precision: 'day', inclusivity: '[]'});
           };
 
           scope.monthClick = function () {

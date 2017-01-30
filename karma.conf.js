@@ -15,8 +15,15 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'bower_components/moment/min/moment-with-locales.js',
+      'bower_components/jquery/dist/jquery.js',
       'bower_components/angular/angular.js',
-      'bower_components/angular-mocks/angular-mocks.js'
+      'bower_components/angular-mocks/angular-mocks.js',
+      'js/kt-date-picker.module.js',
+      'js/services/kt-day-picker.service.js',
+      'js/services/kt-date-bounds.service.js',
+      // 'kt-angular-date-picker.standalone.js',
+      'spec/**/*.js'
     ],
 
 

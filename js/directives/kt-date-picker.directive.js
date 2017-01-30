@@ -81,7 +81,7 @@
           scope.dateStringChanged = function () {
             var date = moment(scope.dateString, scope.format, true);
 
-            if (!date.isValid() || !ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, null, '[]')) {
+            if (!date.isValid() || !ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, {inclusivity: '[]'})) {
               return;
             }
 

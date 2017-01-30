@@ -9,7 +9,7 @@
       var service = {};
       var dayHeaders;
 
-      service.getWeekRangeForMonth = function (year, month) {
+      function getWeekRangeForMonth(year, month) {
         var date = moment().set({year: year, month: month});
         var start = date.clone().startOf('month');
         var end = date.clone().endOf('month');
@@ -29,23 +29,23 @@
           startWeek: startWeek,
           endWeek  : endWeek
         };
-      };
+      }
 
-      service.getDatesInWeek = function (year, month, week) {
-        var date = moment().year(year).month(month).week(week);
+      function getDatesInWeek(year, week) {
+        var date = moment().year(year).week(week);
         var days = [];
         for (var i = 0; i < 7; i++) {
           days.push(date.clone().weekday(i));
         }
 
         return days;
-      };
+      }
 
       service.getWeeksInMonth = function (year, month) {
-        var weeksInMonth = service.getWeekRangeForMonth(year, month);
+        var weeksInMonth = getWeekRangeForMonth(year, month);
         var weeks = [];
         for (var i = weeksInMonth.startWeek; i <= weeksInMonth.endWeek; i++) {
-          weeks.push({week: i, dates: service.getDatesInWeek(year, month, i)});
+          weeks.push({week: i, dates: getDatesInWeek(year, i)});
         }
 
         return weeks;
