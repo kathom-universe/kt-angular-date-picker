@@ -24,8 +24,8 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "        <button ng-click=\"setCurrentPicker('start')\" ng-class=\"{'kt-date-range-picker-active-range': isCurrentPicker('start')}\">{{getDisplayedDate(startDate)}}</button>\n" +
     "        <button ng-click=\"setCurrentPicker('end')\" ng-class=\"{'kt-date-range-picker-active-range': isCurrentPicker('end')}\">{{getDisplayedDate(endDate)}}</button>\n" +
     "    </div>\n" +
-    "    <kt-date-picker ng-model=\"$parent.startDate\" min-date=\"$parent.minDate\" max-date=\"$parent.maxDate\" format=\"{{$parent.format}}\" ng-if=\"isCurrentPicker('start')\"></kt-date-picker>\n" +
-    "    <kt-date-picker ng-model=\"$parent.endDate\" min-date=\"$parent.startDate\" max-date=\"$parent.maxDate\" format=\"{{$parent.format}}\" ng-if=\"isCurrentPicker('end')\"></kt-date-picker>\n" +
+    "    <kt-date-picker ng-model=\"startDate\" min-date=\"minDate\" max-date=\"maxDate\" format=\"{{format}}\" ng-show=\"isCurrentPicker('start')\"></kt-date-picker>\n" +
+    "    <kt-date-picker ng-model=\"endDate\" min-date=\"startDate\" max-date=\"maxDate\" format=\"{{format}}\" ng-show=\"isCurrentPicker('end')\"></kt-date-picker>\n" +
     "</div>");
   $templateCache.put("html/kt-day-picker.html",
     "<div>\n" +

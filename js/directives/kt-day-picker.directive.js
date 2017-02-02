@@ -8,14 +8,18 @@
     .directive('ktDayPicker', ['ktDayPickerSvc', 'ktDateBoundsService', function (dayPickerService, ktDateBounds) {
       return {
         restrict   : 'E',
-        require    : 'ngModel',
+        require    : ['ngModel', '?^ktDatePicker', '^^?ktDateRangePicker'],
         templateUrl: 'html/kt-day-picker.html',
         scope      : {
           minDate: '=',
           maxDate: '=',
           format : '@'
         },
-        link       : function (scope, element, attributes, ngModelController) {
+        link       : function (scope, element, attributes, controllers) {
+          var ngModelController = controllers[0];
+          var ktDatePicker = controllers[1];
+          var ktDateRangePicker = controllers[2];
+
           scope.dayPicker = {
             month     : undefined,
             year      : undefined,
@@ -40,7 +44,9 @@
             scope.date.year(date.year()).month(date.month()).date(date.date());
             ngModelController.$setViewValue(scope.format ? scope.date.format(scope.format) : scope.date);
 
-            scope.$emit('dayPicker:daySelect');
+            if (ktDateRangePicker) {
+              ktDateRangePicker.requestNextRange();
+            }
           };
 
           scope.previousMonth = function () {
@@ -95,19 +101,14 @@
           };
 
           scope.monthClick = function () {
-            scope.$emit('dayPicker:monthClick');
+            if (ktDatePicker) {
+              ktDatePicker.requestPicker('month');
+            }
           };
 
           scope.canChooseMonth = function () {
-            var parentElement = scope.$parent.element ? scope.$parent.element : undefined;
-
-            if (parentElement && parentElement.prop('tagName').toLowerCase() === 'kt-date-picker' && (scope.hasPreviousMonth() || scope.hasNextMonth())) {
-              return true;
-            }
-
-            return false;
+            return !!ktDatePicker && (scope.hasPreviousMonth() || scope.hasNextMonth());
           };
-
 
           scope.$on('monthPickerSelect', function (event, month) {
             var date = moment({year: scope.dayPicker.year, month: month});

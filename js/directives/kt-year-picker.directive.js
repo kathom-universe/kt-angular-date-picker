@@ -28,14 +28,16 @@
 
       return {
         restrict   : 'E',
-        require    : 'ngModel',
+        require    : ['ngModel', '?^ktDatePicker'],
         templateUrl: 'html/kt-year-picker.html',
         scope      : {
           minDate: '=',
           maxDate: '=',
           format : '@'
         },
-        link       : function (scope, element, attributes, ngModelController) {
+        link       : function (scope, element, attributes, controllers) {
+          var ngModelController = controllers[0];
+          var ktDatePicker = controllers[1];
           var decade = getDecade(scope.date ? scope.date.year() : moment().clone().year());
 
           scope.yearPicker = {
@@ -71,7 +73,9 @@
 
             ngModelController.$setViewValue(scope.format ? scope.date.format(scope.format) : scope.date);
 
-            scope.$emit('yearPicker:yearSelect');
+            if (ktDatePicker) {
+              ktDatePicker.requestPicker('month');
+            }
           };
 
           scope.previousDecade = function () {

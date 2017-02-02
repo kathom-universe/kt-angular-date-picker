@@ -12,46 +12,24 @@
           ngModel  : '=',
           minDate: '=',
           maxDate: '=',
-          format : '@'
+          format : '@',
+          onDateSelect: '&'
         },
         templateUrl: 'html/kt-date-picker.html',
-        link       : function (scope, element) {
-          scope.element = element;
+        controller : function ($scope) {
           var currentPicker = 'day';
 
-          scope.setCurrentPicker = function (picker) {
+          this.requestPicker = function (picker) {
+            $scope.setCurrentPicker(picker);
+          };
+
+          $scope.setCurrentPicker = function (picker) {
             currentPicker = picker;
           };
 
-          scope.isCurrentPicker = function (picker) {
+          $scope.isCurrentPicker = function (picker) {
             return currentPicker === picker;
           };
-
-          scope.$on('dayPicker:daySelect', function (ev) {
-            scope.$emit('datePicker:dateSelect');
-
-            ev.stopPropagation();
-          });
-
-          scope.$on('dayPicker:monthClick', function (ev) {
-            currentPicker = 'month';
-            ev.stopPropagation();
-          });
-
-          scope.$on('monthPicker:monthSelect', function (ev) {
-            currentPicker = 'day';
-            ev.stopPropagation();
-          });
-
-          scope.$on('yearPicker:yearSelect', function (ev) {
-            currentPicker = 'month';
-            ev.stopPropagation();
-          });
-
-          scope.$on('monthPicker:yearClick', function (ev) {
-            currentPicker = 'year';
-            ev.stopPropagation();
-          });
         }
       }
     }])

@@ -19,14 +19,17 @@
 
       return {
         restrict   : 'E',
-        require: 'ngModel',
+        require: ['ngModel', '?^ktDatePicker'],
         scope      : {
           minDate: '=',
           maxDate: '=',
           format : '@'
         },
         templateUrl: 'html/kt-month-picker.html',
-        link       : function (scope, element, attributes, ngModelController) {
+        link       : function (scope, element, attributes, controllers) {
+          var ngModelController = controllers[0];
+          var ktDatePicker = controllers[1];
+
           scope.monthPicker = {
             year  : scope.date ? scope.date.year : moment().clone().year(),
             months: getMonths()
@@ -69,7 +72,9 @@
 
             ngModelController.$setViewValue(scope.format ? scope.date.format(scope.format) : scope.date);
 
-            scope.$emit('monthPicker:monthSelect');
+            if (ktDatePicker) {
+              ktDatePicker.requestPicker('day');
+            }
           };
 
           scope.previousYear = function () {
@@ -99,11 +104,13 @@
           };
 
           scope.yearClick = function () {
-            scope.$emit('monthPicker:yearClick');
+            if (ktDatePicker) {
+              ktDatePicker.requestPicker('year');
+            }
           };
 
           scope.canChooseYear = function () {
-            return scope.hasPreviousYear() || scope.hasNextYear();
+            return !!ktDatePicker && (scope.hasPreviousYear() || scope.hasNextYear());
           };
         }
       };

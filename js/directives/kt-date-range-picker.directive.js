@@ -14,37 +14,32 @@
         format   : '@'
       },
       templateUrl: 'html/kt-date-range-picker.html',
-      link       : function (scope, element) {
-        scope.element = element;
+      controller : function ($scope) {
         var currentPicker = 'start';
 
-        scope.$watch('startDate', function (startDate) {
-          var date = ktDateBounds.getMomentWithinBounds(scope.endDate, startDate, scope.maxDate, {
+        this.requestNextRange = function () {
+          currentPicker = currentPicker === 'start' ? 'end' : 'start';
+        };
+
+        $scope.$watch('startDate', function (startDate) {
+          var date = ktDateBounds.getMomentWithinBounds($scope.endDate, startDate, $scope.maxDate, {
             precision: 'day',
             inclusivity: '[]',
-            format: scope.format
+            format: $scope.format
           });
-          scope.endDate = scope.format ? date.format(scope.format) : date;
+          $scope.endDate = $scope.format ? date.format($scope.format) : date;
         });
 
-        scope.$on('datePicker:dateSelect', function (ev) {
-          ev.stopPropagation();
-
-          $timeout(function () {
-            currentPicker = currentPicker === 'start' ? 'end' : 'start';
-          }, 0);
-        });
-
-        scope.isCurrentPicker = function (picker) {
+        $scope.isCurrentPicker = function (picker) {
           return currentPicker === picker;
         };
 
-        scope.setCurrentPicker = function (picker) {
+        $scope.setCurrentPicker = function (picker) {
           currentPicker = picker;
         };
 
-        scope.getDisplayedDate = function (date) {
-          return moment(date, scope.format).format('D. MMMM YYYY');
+        $scope.getDisplayedDate = function (date) {
+          return moment(date, $scope.format).format('D. MMMM YYYY');
         }
       }
     };

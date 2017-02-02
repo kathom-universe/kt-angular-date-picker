@@ -3,6 +3,6 @@
         <button ng-click="setCurrentPicker('start')" ng-class="{'kt-date-range-picker-active-range': isCurrentPicker('start')}">{{getDisplayedDate(startDate)}}</button>
         <button ng-click="setCurrentPicker('end')" ng-class="{'kt-date-range-picker-active-range': isCurrentPicker('end')}">{{getDisplayedDate(endDate)}}</button>
     </div>
-    <kt-date-picker ng-model="$parent.startDate" min-date="$parent.minDate" max-date="$parent.maxDate" format="{{$parent.format}}" ng-if="isCurrentPicker('start')"></kt-date-picker>
-    <kt-date-picker ng-model="$parent.endDate" min-date="$parent.startDate" max-date="$parent.maxDate" format="{{$parent.format}}" ng-if="isCurrentPicker('end')"></kt-date-picker>
+    <kt-date-picker ng-model="startDate" min-date="minDate" max-date="maxDate" format="{{format}}" ng-show="isCurrentPicker('start')"></kt-date-picker>
+    <kt-date-picker ng-model="endDate" min-date="startDate" max-date="maxDate" format="{{format}}" ng-show="isCurrentPicker('end')"></kt-date-picker>
 </div>
