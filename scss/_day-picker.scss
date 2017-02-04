@@ -1,0 +1,66 @@
+@import "themes";
+
+@function kt-day-picker-height($theme, $includePadding: false) {
+  $navigation-height : theme-property($theme, 'cell-size') + theme-property($theme, 'margin-navigation');
+  $day-header-height : theme-property($theme, 'cell-size') + theme-property($theme, 'margin-day-header');
+  $content-height : 6 * theme-property($theme, 'cell-size');
+  $padding : theme-property($theme, 'padding');
+
+  $baseHeight : $navigation-height + $day-header-height + $content-height;
+
+  @if $includePadding == true {
+    @return $baseHeight + ($padding * 2);
+  }
+
+  @return $baseHeight;
+}
+
+@function kt-day-picker-width($theme, $includePadding: false) {
+  $baseWidth: 7 * theme-property($theme, 'cell-size');
+  $padding : theme-property($theme, 'padding');
+
+  @if $includePadding == true {
+    @return $baseWidth + ($padding * 2);
+  }
+
+  @return $baseWidth;
+}
+
+@mixin _kt-day-picker-box($theme) {
+  .kt-dp--theme-#{$theme} kt-day-picker {
+    display : block;
+  }
+
+  kt-day-picker.kt-dp--theme-#{$theme} {
+    display : inline-block;
+  }
+
+  .kt-dp--theme-#{$theme} kt-day-picker,
+  kt-day-picker.kt-dp--theme-#{$theme} {
+    height  : kt-day-picker-height($theme);
+    padding : theme-property($theme, 'padding');
+  }
+}
+
+@mixin _kt-day-picker-background($theme) {
+  .kt-dp--theme-#{$theme} kt-day-picker,
+  kt-day-picker.kt-dp--theme-#{$theme} {
+    background : theme-property($theme, 'background');
+  }
+}
+
+@mixin _kt-day-header($theme) {
+  .kt-dp--theme-#{$theme} kt-day-header,
+  kt-day-header.kt-dp--theme-#{$theme} {
+    color         : theme-property($theme, 'color-muted');
+    display       : block;
+    line-height   : theme-property($theme, 'cell-size');
+    margin-bottom : theme-property($theme, 'margin-day-header');
+  }
+}
+
+@mixin _kt-day-picker($theme) {
+  @include _kt-day-picker-box($theme);
+  @include _kt-day-picker-background($theme);
+  @include _kt-day-header($theme);
+}

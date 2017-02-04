@@ -1,0 +1,35 @@
+$kt-dp-themes : (
+  material-light: (
+    animation-duration  : 0.25s,
+    background          : #FFFFFF,
+    background-disabled : #FFCCCC,
+    background-hover    : #CCCCCC,
+    background-selected : #106CC8,
+    cell-size           : 40px,
+    circle              : false,
+    color               : #222222,
+    color-muted         : #757575,
+    margin-day-header   : 5px,
+    margin-navigation   : 5px,
+    padding             : 10px
+  ),
+  material-dark: (
+    animation-duration  : 0.25s,
+    background          : #424242,
+    background-disabled : #6C4848,
+    background-hover    : #555555,
+    background-selected : #80CBC4,
+    cell-size           : 40px,
+    circle-selected     : true,
+    color               : #FFFFFF,
+    color-muted         : #C6C6C6,
+    margin-day-header   : 5px,
+    margin-navigation   : 5px,
+    padding             : 10px
+  )
+);
+
+@function theme-property($theme, $property) {
+  $theme: map_get($kt-dp-themes, $theme);
+  @return map_get($theme, $property);
+}

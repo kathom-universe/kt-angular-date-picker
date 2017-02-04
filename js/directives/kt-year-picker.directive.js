@@ -1,11 +1,7 @@
 (function () {
   'use strict';
 
-  angular
-
-    .module('kt.datePicker')
-
-    .directive('ktYearPicker', ['ktDateBoundsService', function (ktDateBounds) {
+  angular.module('kt.datePicker').directive('ktYearPicker', ['ktDateBoundsService', function (ktDateBounds) {
       function getDecade(year) {
         var start = year - year % 10;
         var end = start + 9;
@@ -39,10 +35,19 @@
           var ngModelController = controllers[0];
           var ktDatePicker = controllers[1];
           var decade = getDecade(scope.date ? scope.date.year() : moment().clone().year());
+          var yearsPerRow = 3;
+
+          function chunk(arr, size) {
+            var newArr = [];
+            for (var i = 0; i < arr.length; i += size) {
+              newArr.push(arr.slice(i, i + size));
+            }
+            return newArr;
+          }
 
           scope.yearPicker = {
             decade: decade,
-            years : getYears(decade)
+            chunkedYears : chunk(getYears(decade), yearsPerRow)
           };
 
           scope.date = ktDateBounds.getMomentWithinBounds(scope.date, scope.minDate, scope.maxDate, {
@@ -55,9 +60,9 @@
             return ngModelController.$modelValue;
           }, function(newValue) {
             scope.date = moment(newValue, scope.format);
-            if (scope.yearPicker.years.indexOf(scope.date.year()) === -1) {
+            if (scope.date.year() < scope.yearPicker.decade.start || scope.date.year() > scope.yearPicker.decade.end) {
               scope.yearPicker.decade = getDecade(scope.date.year());
-              scope.yearPicker.years = getYears(scope.yearPicker.decade);
+              scope.yearPicker.chunkedYears = chunk(getYears(scope.yearPicker.decade), yearsPerRow);
             }
           });
 
@@ -81,11 +86,11 @@
           scope.previousDecade = function () {
             scope.yearPicker.decade.start -= 10;
             scope.yearPicker.decade.end -= 10;
-            scope.yearPicker.years = getYears(scope.yearPicker.decade);
+            scope.yearPicker.chunkedYears = chunk(getYears(scope.yearPicker.decade), yearsPerRow);
           };
 
           scope.hasPreviousDecade = function () {
-            var date = moment().clone().year(scope.yearPicker.years[0]);
+            var date = moment().clone().year(scope.yearPicker.decade.start);
             date.subtract(1, 'years');
             return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, {
               precision: 'year', inclusivity: '[]', format: scope.format
@@ -95,12 +100,12 @@
           scope.nextDecade = function () {
             scope.yearPicker.decade.start += 10;
             scope.yearPicker.decade.end += 10;
-            scope.yearPicker.years = getYears(scope.yearPicker.decade);
+            scope.yearPicker.chunkedYears = chunk(getYears(scope.yearPicker.decade), yearsPerRow);
           };
 
           scope.hasNextDecade = function () {
-            var date = moment().clone().year(scope.yearPicker.years[0]);
-            date.add(10, 'years');
+            var date = moment().clone().year(scope.yearPicker.decade.end);
+            date.add(1, 'years');
             return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, {
               precision: 'year', inclusivity: '[]', format: scope.format
             });
@@ -120,12 +125,13 @@
 
           scope.isInMinMaxRange = function (year) {
             var date = moment().clone().year(year);
-            var minDate = scope.minDate ? moment(scope.minDate, scope.format) : undefined;
-            var maxDate = scope.maxDate ? moment(scope.maxDate, scope.format) : undefined;
 
-            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, {precision: 'year', inclusivity: '[]'});
+            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, {
+              precision: 'year', inclusivity: '[]', format: scope.format
+            });
           };
         }
       };
     }]);
+
 })();

@@ -1,15 +1,32 @@
-<div>
-  <div class="kt-date-picker-header">
-    <button type="button" ng-click="previousDecade()" ng-disabled="!hasPreviousDecade()"><kt-date-picker-previous-icon></kt-date-picker-previous-icon></button>
-    <button type="button" disabled="disabled">{{yearPicker.decade.start}} - {{yearPicker.decade.end}}</button>
-    <button type="button" ng-click="nextDecade()" ng-disabled="!hasNextDecade()"><kt-date-picker-next-icon></kt-date-picker-next-icon></button>
+<div class="kt-dp-flex-row kt-dp-navigation">
+  <div class="kt-dp-flex-cell">
+    <button type="button" class="kt-dp-navigation__button kt-button--block"
+            ng-click="previousDecade()" ng-disabled="!hasPreviousDecade()">
+      <kt-date-picker-previous-icon></kt-date-picker-previous-icon>
+    </button>
   </div>
-  <div class="kt-date-picker-content">
-    <div class="kt-year-picker-cell"
-         ng-repeat="year in yearPicker.years"
-         ng-class="{'kt-date-picker-selected': isSelected(year), 'kt-date-picker-overflow': isOverflowing(year)}">
-      <button type="button" ng-click="selectYear(year)" ng-disabled="!isInMinMaxRange(year)">{{year}}</button>
-    </div>
+  <div class="kt-dp-flex-cell">
+    <button type="button" class="kt-dp-navigation__button kt-button--block" disabled="disabled">
+      {{yearPicker.decade.start}} - {{yearPicker.decade.end}}
+    </button>
   </div>
-  <div class="kt-date-picker-footer"></div>
+  <div class="kt-dp-flex-cell">
+    <button type="button" class="kt-dp-navigation__button kt-button--block"
+            ng-click="nextDecade()" ng-disabled="!hasNextDecade()">
+      <kt-date-picker-next-icon></kt-date-picker-next-icon>
+    </button>
+  </div>
+</div>
+
+<div class="kt-dp-flex-row" ng-repeat="yearChunk in yearPicker.chunkedYears">
+  <div class="kt-dp-flex-cell" ng-repeat="year in yearChunk">
+      <button
+          type="button"
+          class="kt-dp-date"
+          ng-click="selectYear(year)"
+          ng-class="{'kt-dp-date--selected': isSelected(year), 'kt-dp-date--overflow': isOverflowing(year)}"
+          ng-disabled="!isInMinMaxRange(year)">
+        {{year}}
+      </button>
+  </div>
 </div>

@@ -29,10 +29,19 @@
         link       : function (scope, element, attributes, controllers) {
           var ngModelController = controllers[0];
           var ktDatePicker = controllers[1];
+          var monthsPerRow = 3;
+
+          function chunk(arr, size) {
+            var newArr = [];
+            for (var i = 0; i < arr.length; i += size) {
+              newArr.push(arr.slice(i, i + size));
+            }
+            return newArr;
+          }
 
           scope.monthPicker = {
             year  : scope.date ? scope.date.year : moment().clone().year(),
-            months: getMonths()
+            monthChunks: chunk(getMonths(), monthsPerRow)
           };
 
           scope.date = ktDateBounds.getMomentWithinBounds(scope.date, scope.minDate, scope.maxDate, {

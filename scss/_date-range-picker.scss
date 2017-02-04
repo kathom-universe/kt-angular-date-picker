@@ -1,0 +1,73 @@
+@import "themes";
+@import "date-picker";
+
+@function kt-date-range-picker-height($theme) {
+  $padding : theme-property($theme, 'padding');
+  $date-range-navigation-height : theme-property($theme, 'cell-size') + theme-property($theme, 'margin-navigation');
+
+  @return kt-date-picker-height($theme) + $date-range-navigation-height + $padding;
+}
+
+@function kt-date-range-picker-width($theme) {
+  @return kt-date-picker-width($theme);
+}
+
+@mixin _kt-date-range-navigation($theme) {
+  .kt-dp--theme-#{$theme} .kt-dp-range-navigation {
+    margin-bottom : theme-property($theme, 'margin-navigation');
+    padding-left  : theme-property($theme, 'padding');
+    padding-right : theme-property($theme, 'padding');
+    padding-top   : theme-property($theme, 'padding');
+  }
+}
+
+@mixin _kt-date-range-picker-box($theme) {
+  @include _kt-date-range-navigation($theme);
+
+  kt-date-range-picker.kt-dp--theme-#{$theme} {
+    display : inline-block;
+    height  : kt-date-range-picker-height($theme);
+    width   : kt-date-range-picker-width($theme);
+  }
+}
+
+@mixin _kt-date-range-picker-background($theme) {
+  kt-date-range-picker.kt-dp--theme-#{$theme} {
+    background : theme-property($theme, 'background');
+  }
+}
+
+@mixin _kt-date-range-picker-animation($theme) {
+  kt-date-range-picker.kt-dp--theme-#{$theme} {
+    overflow : hidden;
+    position : relative;
+
+    > kt-date-picker {
+      position : absolute;
+      left     : 0;
+      right    : 0;
+
+      &:first-of-type.ng-hide-add {
+        animation : slideOutLeft theme-property($theme, 'animation-duration');
+      }
+
+      &:last-of-type.ng-hide-remove {
+        animation : slideInRight theme-property($theme, 'animation-duration');
+      }
+
+      &:last-of-type.ng-hide-add {
+        animation : slideOutRight theme-property($theme, 'animation-duration');
+      }
+
+      &:first-of-type.ng-hide-remove {
+        animation : slideInLeft theme-property($theme, 'animation-duration');
+      }
+    }
+  }
+}
+
+@mixin _kt-date-range-picker($theme) {
+  @include _kt-date-range-picker-box($theme);
+  @include _kt-date-range-picker-animation($theme);
+  @include _kt-date-range-picker-background($theme);
+}

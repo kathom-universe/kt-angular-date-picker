@@ -1,8 +1,24 @@
-<div>
-    <div class="kt-date-range-picker-header" style="display: table; width: 100%">
-        <button ng-click="setCurrentPicker('start')" ng-class="{'kt-date-range-picker-active-range': isCurrentPicker('start')}">{{getDisplayedDate(startDate)}}</button>
-        <button ng-click="setCurrentPicker('end')" ng-class="{'kt-date-range-picker-active-range': isCurrentPicker('end')}">{{getDisplayedDate(endDate)}}</button>
-    </div>
-    <kt-date-picker ng-model="startDate" min-date="minDate" max-date="maxDate" format="{{format}}" ng-show="isCurrentPicker('start')"></kt-date-picker>
-    <kt-date-picker ng-model="endDate" min-date="startDate" max-date="maxDate" format="{{format}}" ng-show="isCurrentPicker('end')"></kt-date-picker>
+<div class="kt-dp-flex-row kt-dp-range-navigation">
+  <div class="kt-dp-flex-cell">
+    <button class="kt-dp-date kt-button--block"
+            ng-click="setCurrentPicker('start')"
+            ng-class="{'kt-dp-date--selected': isCurrentPicker('start')}">
+      {{getDisplayedDate(startDate)}}
+    </button>
+  </div>
+  <div class="kt-dp-flex-cell">
+    <button class="kt-dp-date kt-button--block"
+            ng-click="setCurrentPicker('end')"
+            ng-class="{'kt-dp-date--selected': isCurrentPicker('end')}">
+      {{getDisplayedDate(endDate)}}
+    </button>
+  </div>
 </div>
+
+<kt-date-picker ng-model="startDate" min-date="minDate" max-date="maxDate" format="{{format}}"
+                ng-show="isCurrentPicker('start')">
+</kt-date-picker>
+<kt-date-picker ng-model="endDate" min-date="startDate" max-date="maxDate" format="{{format}}"
+                ng-show="isCurrentPicker('end')">
+</kt-date-picker>
+

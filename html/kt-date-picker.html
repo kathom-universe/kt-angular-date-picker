@@ -1,5 +1,12 @@
-<div>
-  <kt-day-picker ng-model="$parent.ngModel" min-date="$parent.minDate" max-date="$parent.maxDate" format="{{$parent.format}}" ng-if="isCurrentPicker('day')"></kt-day-picker>
-  <kt-month-picker ng-model="$parent.ngModel" min-date="$parent.minDate" max-date="$parent.maxDate" format="{{$parent.format}}" ng-if="isCurrentPicker('month')"></kt-month-picker>
-  <kt-year-picker ng-model="$parent.ngModel" min-date="$parent.minDate" max-date="$parent.maxDate" format="{{$parent.format}}" ng-if="isCurrentPicker('year')"></kt-year-picker>
-</div>
+<kt-day-picker
+    ng-model="ngModel" min-date="minDate" max-date="maxDate" format="{{format}}"
+    ng-show="isCurrentPicker('day')">
+</kt-day-picker>
+<kt-month-picker
+    ng-model="ngModel" min-date="minDate" max-date="maxDate" format="{{format}}"
+    ng-show="isCurrentPicker('month')">
+</kt-month-picker>
+<kt-year-picker
+    ng-model="ngModel" min-date="minDate" max-date="maxDate" format="{{format}}"
+    ng-show="isCurrentPicker('year')">
+</kt-year-picker>

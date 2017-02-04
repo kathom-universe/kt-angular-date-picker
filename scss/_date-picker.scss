@@ -1,0 +1,72 @@
+@import "themes";
+@import "day-picker";
+
+@function kt-date-picker-height($theme) {
+  @return kt-day-picker-height($theme, true);
+}
+
+@function kt-date-picker-width($theme) {
+  @return kt-day-picker-width($theme, true);
+}
+
+@mixin _kt-date-picker-height($theme) {
+  .kt-dp--theme-#{$theme} kt-date-picker {
+    height : kt-date-picker-height($theme);
+  }
+
+  kt-date-picker.kt-dp--theme-#{$theme} {
+    height : kt-date-picker-height($theme);
+  }
+}
+
+@mixin _kt-date-picker-box($theme) {
+  @include _kt-date-picker-height($theme);
+
+  .kt-dp--theme-#{$theme} kt-date-picker {
+    display: block;
+  }
+
+  kt-date-picker.kt-dp--theme-#{$theme} {
+    display : inline-block;
+    width   : kt-date-picker-width($theme);
+  }
+}
+
+@mixin _kt-date-picker-animation($theme) {
+  .kt-dp--theme-#{$theme} kt-date-picker,
+  kt-date-picker.kt-dp--theme-#{$theme} {
+    overflow : hidden;
+    position : relative;
+
+    > * {
+      position : absolute;
+      left     : 0;
+      right    : 0;
+
+      &.ng-hide-add {
+        animation : slideOutUp theme-property($theme, 'animation-duration');
+
+        & + .ng-hide-remove {
+          animation : slideInUp theme-property($theme, 'animation-duration');
+        }
+      }
+
+      &.ng-hide-remove {
+        animation : slideInDown theme-property($theme, 'animation-duration');
+
+        & + .ng-hide-add {
+          animation : slideOutDown theme-property($theme, 'animation-duration');
+        }
+      }
+
+      &:last-child.ng-hide-add {
+        animation : slideOutDown theme-property($theme, 'animation-duration');
+      }
+    }
+  }
+}
+
+@mixin _kt-date-picker($theme) {
+  @include _kt-date-picker-animation($theme);
+  @include _kt-date-picker-box($theme);
+}

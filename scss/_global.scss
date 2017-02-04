@@ -1,0 +1,73 @@
+@import "themes";
+
+@mixin _kt-date-picker-global($theme) {
+  .kt-dp--theme-#{$theme} {
+    color       : theme-property($theme, 'color');
+    font-family : 'Roboto', sans-serif;
+    font-size   : 0.8rem;
+
+    button {
+      background  : transparent;
+      border      : none;
+      color       : inherit;
+      cursor      : pointer;
+      font-family : inherit;
+      font-size   : inherit;
+      padding     : 0;
+    }
+
+    svg {
+      fill : theme-property($theme, 'color');
+    }
+
+    .kt-dp-flex-row {
+      display: flex;
+    }
+
+    .kt-dp-flex-cell {
+      //noinspection CssRedundantUnit
+      flex       : 1 1 0%;
+      text-align : center;
+    }
+
+    .kt-dp-navigation {
+      margin-bottom : theme-property($theme, 'margin-navigation');
+    }
+
+    .kt-dp-navigation .kt-dp-flex-cell:nth-of-type(2) {
+      //noinspection CssRedundantUnit
+      flex : 5 1 0%;
+    }
+
+    .kt-dp-navigation__button {
+      height: theme-property($theme, 'cell-size');
+    }
+
+    .kt-dp-date {
+      @extend .kt-button--block;
+      height : theme-property($theme, 'cell-size');
+      min-width: theme-property($theme, 'cell-size');
+
+      &--selected {
+        background-color: theme-property($theme, 'background-selected');
+        color : theme-property($theme, 'background');
+      }
+
+      &:disabled {
+        background-color: theme-property($theme, 'background-disabled');
+      }
+  }
+
+    .kt-dp-date--overflow:not(.kt-dp-date--selected) {
+      color: theme-property($theme, 'color-muted');
+    }
+
+    button:disabled {
+      cursor: default;
+    }
+
+    button:not(:disabled):not(.kt-dp-date--selected):hover {
+      background-color: theme-property($theme, 'background-hover');
+    }
+  }
+}

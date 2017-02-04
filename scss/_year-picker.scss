@@ -1,0 +1,30 @@
+@import "themes";
+@import "day-picker";
+
+@mixin _kt-year-picker-box($theme) {
+  .kt-dp--theme-#{$theme} kt-year-picker {
+    display : block;
+    height  : kt-day-picker-height($theme);
+  }
+
+  kt-year-picker.kt-dp--theme-#{$theme} {
+    display : inline-block;
+  }
+
+  .kt-dp--theme-#{$theme} kt-year-picker,
+  kt-year-picker.kt-dp--theme-#{$theme} {
+    padding : theme-property($theme, 'padding');
+  }
+}
+
+@mixin _kt-year-picker-background($theme) {
+  .kt-dp--theme-#{$theme} kt-year-picker,
+  kt-year-picker.kt-dp--theme-#{$theme} {
+    background : theme-property($theme, 'background');
+  }
+}
+
+@mixin _kt-year-picker($theme) {
+  @include _kt-year-picker-box($theme);
+  @include _kt-year-picker-background($theme);
+}
