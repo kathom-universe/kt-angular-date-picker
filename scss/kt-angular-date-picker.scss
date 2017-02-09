@@ -5,6 +5,7 @@
 @import "month-picker";
 @import "year-picker";
 @import "date-picker";
+@import "date-range-select";
 @import "date-range-picker";
 
 @mixin kt-date-picker($theme) {
@@ -13,6 +14,7 @@
   @include _kt-month-picker($theme);
   @include _kt-year-picker($theme);
   @include _kt-date-picker($theme);
+  @include _kt-date-range-select($theme);
   @include _kt-date-range-picker($theme);
 }
 

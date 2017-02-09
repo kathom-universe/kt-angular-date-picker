@@ -1,0 +1,25 @@
+@import "themes";
+@import "date-range-picker";
+
+@mixin _kt-date-range-select-box($theme) {
+  .kt-dp--theme-#{$theme} kt-date-range-select {
+    display : block;
+    height  : kt-date-range-picker-content-height($theme);
+  }
+
+  kt-date-range-select.kt-dp--theme-#{$theme} {
+    display : inline-block;
+  }
+}
+
+@mixin _kt-date-range-select-background($theme) {
+  .kt-dp--theme-#{$theme} kt-date-range-select,
+  kt-date-range-select.kt-dp--theme-#{$theme} {
+    background : theme-property($theme, 'background');
+  }
+}
+
+@mixin _kt-date-range-select($theme) {
+  @include _kt-date-range-select-box($theme);
+  @include _kt-date-range-select-background($theme);
+}

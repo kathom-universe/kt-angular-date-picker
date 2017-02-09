@@ -8,6 +8,10 @@
   @return kt-date-picker-height($theme) + $date-range-navigation-height + $padding;
 }
 
+@function kt-date-range-picker-content-height($theme) {
+  @return kt-date-picker-height($theme);
+}
+
 @function kt-date-range-picker-width($theme) {
   @return kt-date-picker-width($theme);
 }
@@ -26,8 +30,11 @@
 
   kt-date-range-picker.kt-dp--theme-#{$theme} {
     display : inline-block;
-    height  : kt-date-range-picker-height($theme);
     width   : kt-date-range-picker-width($theme);
+
+    .kt-dp-picker-container {
+      height: kt-date-range-picker-content-height($theme);
+    }
   }
 }
 
@@ -39,14 +46,34 @@
 
 @mixin _kt-date-range-picker-animation($theme) {
   kt-date-range-picker.kt-dp--theme-#{$theme} {
-    overflow : hidden;
-    position : relative;
+    .kt-dp-picker-container {
+      overflow : hidden;
+      position : relative;
+    }
 
-    > kt-date-picker {
+    .kt-dp-picker-container > * {
       position : absolute;
       left     : 0;
       right    : 0;
+    }
 
+    kt-date-range-select.ng-hide-add {
+      animation : zoomOutDown theme-property($theme, 'animation-duration');
+
+      ~ kt-date-picker.ng-hide-remove {
+        animation: zoomInDown theme-property($theme, 'animation-duration');
+      }
+    }
+
+    kt-date-range-select.ng-hide-remove {
+      animation: zoomInUp theme-property($theme, 'animation-duration');
+
+      ~ kt-date-picker.ng-hide-add {
+        animation: zoomOutUp theme-property($theme, 'animation-duration');
+      }
+    }
+
+    kt-date-picker {
       &:first-of-type.ng-hide-add {
         animation : slideOutLeft theme-property($theme, 'animation-duration');
       }
@@ -67,6 +94,7 @@
 }
 
 @mixin _kt-date-range-picker($theme) {
+  @debug kt-date-range-picker-content-height($theme);
   @include _kt-date-range-picker-box($theme);
   @include _kt-date-range-picker-animation($theme);
   @include _kt-date-range-picker-background($theme);

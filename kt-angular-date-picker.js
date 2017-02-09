@@ -100,6 +100,79 @@
 
 
 
+  angular.module('kt.datePicker').value('ktDateRanges', [
+    {
+      rangeName: 'past_week',
+      start    : function () {
+        return moment().clone().subtract(1, 'weeks');
+      },
+      end      : function () {
+        return moment().clone();
+      }
+    },
+    {
+      rangeName   : 'past_month',
+      start       : function () {
+        return moment().clone().subtract(1, 'months');
+      },
+      end         : function () {
+        return moment().clone();
+      }
+    },
+    {
+      rangeName: 'past_year',
+      start    : function () {
+        return moment().clone().subtract(1, 'year');
+      },
+      end      : function () {
+        return moment().clone();
+      }
+    }
+  ]);
+
+
+  angular.module('kt.datePicker').value('ktDateRangeLocales', [
+    {
+      locale   : 'en',
+      dateRange: {
+        'past_week' : 'Past Week',
+        'past_month': 'Past Month',
+        'past_year' : 'Past Year',
+        'custom'    : 'Custom'
+      }
+    },
+    {
+      locale   : 'de',
+      dateRange: {
+        'past_week' : 'Letzte 7 Tage',
+        'past_month': 'Letzte 30 Tage',
+        'past_year' : 'Letztes Jahr',
+        'custom'    : 'Benutzerdefiniert'
+      }
+    }
+  ]);
+
+
+  angular.module('kt.datePicker').factory('ktDateRangeSvc', ['ktDateRanges', function (dateRanges) {
+    var service = {};
+
+    service.getDateRangeNames = function () {
+      return dateRanges.map(function (dateRange) {
+        return dateRange.rangeName;
+      });
+    };
+
+    service.getDateRange = function (rangeName) {
+      return dateRanges.filter(function (dateRange) {
+        return dateRange.rangeName === rangeName;
+      })[0];
+    };
+
+    return service;
+  }])
+
+
+
   angular
 
     .module('kt.datePicker')
@@ -164,6 +237,18 @@
       return service;
     }]);
 
+
+
+
+  angular.module('kt.datePicker').filter('ktDateRangeDisplay', ['ktDateRangeLocales', function (dateRangeLocales) {
+    return function (rangeName) {
+      var dateRangeLocale = dateRangeLocales.filter(function (dateRangeLocale) {
+        return dateRangeLocale.locale === moment.locale();
+      })[0];
+
+      return dateRangeLocale.dateRange[rangeName];
+    };
+  }]);
 
 
 
@@ -272,9 +357,7 @@
 
 
 
-  var dateRangePicker = angular.module('kt.datePicker');
-
-  dateRangePicker.directive('ktDateRangePicker', ['$timeout', 'ktDateBoundsService', function ($timeout, ktDateBounds) {
+  angular.module('kt.datePicker').directive('ktDateRangePicker', ['ktDateBoundsService', function (ktDateBounds) {
     return {
       restrict   : 'E',
       scope      : {
@@ -282,21 +365,27 @@
         endDate  : '=',
         minDate  : '=',
         maxDate  : '=',
-        format   : '@'
+        format   : '@',
+        options  : '='
       },
       templateUrl: 'html/kt-date-range-picker.html',
       controller : function ($scope) {
+        // var currentPicker = $scope.options.ranges ? 'range' : 'start';
         var currentPicker = 'start';
 
         this.requestNextRange = function () {
           currentPicker = currentPicker === 'start' ? 'end' : 'start';
         };
 
+        this.requestCustomRange = function () {
+          currentPicker = 'start';
+        };
+
         $scope.$watch('startDate', function (startDate) {
           var date = ktDateBounds.getMomentWithinBounds($scope.endDate, startDate, $scope.maxDate, {
-            precision: 'day',
+            precision  : 'day',
             inclusivity: '[]',
-            format: $scope.format
+            format     : $scope.format
           });
           $scope.endDate = $scope.format ? date.format($scope.format) : date;
         });
@@ -316,26 +405,57 @@
     };
   }]);
 
-  dateRangePicker.directive('ktDateRangePickerInput', ['ktDateBoundsService', function (ktDateBounds) {
+
+  angular.module('kt.datePicker').directive('ktDateRangeSelect', ['ktDateRangeSvc', function (dateRangeSvc) {
+    return {
+      restrict   : 'E',
+      require    : '^?ktDateRangePicker',
+      scope      : {
+        startDate: '=',
+        endDate  : '=',
+        format   : '@',
+        options  : '='
+      },
+      templateUrl: 'html/kt-date-range-select.html',
+      link: function (scope, elem, attrs, ktDateRangePicker) {
+        scope.ranges = scope.options.ranges;
+
+        scope.setRange = function (rangeName) {
+          if (rangeName === 'custom') {
+            ktDateRangePicker.requestCustomRange();
+            return;
+          }
+
+          var range = dateRangeSvc.getDateRange(rangeName);
+
+          scope.startDate = range.start();
+          scope.endDate = range.end();
+        };
+      }
+    };
+  }]);
+
+
+  angular.module('kt.datePicker').directive('ktDateRangePickerInput', ['ktDateBoundsService', function (ktDateBounds) {
     var instanceCount = 0;
 
     return {
-      restrict: 'E',
-      scope: {
+      restrict   : 'E',
+      scope      : {
         startDate: '=',
-        endDate: '=',
-        minDate: '=',
-        maxDate: '=',
-        format: '@',
-        divider: '@'
+        endDate  : '=',
+        minDate  : '=',
+        maxDate  : '=',
+        format   : '@',
+        divider  : '@'
       },
       templateUrl: 'html/kt-date-range-picker-input.html',
-      link: function (scope) {
+      link       : function (scope) {
         scope.instanceCount = instanceCount++;
         scope.dateRangeString = '';
 
-        scope.startDate =  ktDateBounds.getDateWithinBounds(scope.startDate, scope.minDate, scope.maxDate);
-        scope.endDate =  ktDateBounds.getDateWithinBounds(scope.endDate, scope.minDate, scope.maxDate);
+        scope.startDate = ktDateBounds.getDateWithinBounds(scope.startDate, scope.minDate, scope.maxDate);
+        scope.endDate = ktDateBounds.getDateWithinBounds(scope.endDate, scope.minDate, scope.maxDate);
 
         scope.$watch('[startDate, endDate]', function (dates) {
           scope.dateRangeString = dates[0].format(scope.format) + scope.divider + dates[1].format(scope.format);
@@ -356,8 +476,7 @@
           }
 
           if (
-            !ktDateBounds.isDateWithinBounds(startDate, scope.minDate, scope.maxDate, {inclusivity: '[]'}) ||
-            !ktDateBounds.isDateWithinBounds(endDate, startDate, scope.maxDate, {inclusivity: '[]'})
+            !ktDateBounds.isDateWithinBounds(startDate, scope.minDate, scope.maxDate, {inclusivity: '[]'}) || !ktDateBounds.isDateWithinBounds(endDate, startDate, scope.maxDate, {inclusivity: '[]'})
           ) {
             return;
           }
@@ -925,14 +1044,14 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
   $templateCache.put("html/kt-date-range-picker.html",
     "<div class=\"kt-dp-flex-row kt-dp-range-navigation\">\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button class=\"kt-dp-date kt-button--block\"\n" +
+    "    <button class=\"kt-dp-date\"\n" +
     "            ng-click=\"setCurrentPicker('start')\"\n" +
     "            ng-class=\"{'kt-dp-date--selected': isCurrentPicker('start')}\">\n" +
     "      {{getDisplayedDate(startDate)}}\n" +
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button class=\"kt-dp-date kt-button--block\"\n" +
+    "    <button class=\"kt-dp-date\"\n" +
     "            ng-click=\"setCurrentPicker('end')\"\n" +
     "            ng-class=\"{'kt-dp-date--selected': isCurrentPicker('end')}\">\n" +
     "      {{getDisplayedDate(endDate)}}\n" +
@@ -940,14 +1059,36 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "  </div>\n" +
     "</div>\n" +
     "\n" +
-    "<kt-date-picker ng-model=\"startDate\" min-date=\"minDate\" max-date=\"maxDate\" format=\"{{format}}\"\n" +
-    "                ng-show=\"isCurrentPicker('start')\">\n" +
-    "</kt-date-picker>\n" +
-    "<kt-date-picker ng-model=\"endDate\" min-date=\"startDate\" max-date=\"maxDate\" format=\"{{format}}\"\n" +
-    "                ng-show=\"isCurrentPicker('end')\">\n" +
-    "</kt-date-picker>\n" +
+    "<div class=\"kt-dp-picker-container\">\n" +
+    "  <kt-date-range-select start-date=\"startDate\" end-date=\"endDate\" options=\"options\"\n" +
+    "                        ng-show=\"isCurrentPicker('range')\">\n" +
+    "  </kt-date-range-select>\n" +
+    "\n" +
+    "  <kt-date-picker ng-model=\"startDate\" min-date=\"minDate\" max-date=\"maxDate\" format=\"{{format}}\"\n" +
+    "                  ng-show=\"isCurrentPicker('start')\">\n" +
+    "  </kt-date-picker>\n" +
+    "\n" +
+    "  <kt-date-picker ng-model=\"endDate\" min-date=\"startDate\" max-date=\"maxDate\" format=\"{{format}}\"\n" +
+    "                  ng-show=\"isCurrentPicker('end')\">\n" +
+    "  </kt-date-picker>\n" +
+    "</div>\n" +
+    "\n" +
+    "<div class=\"kt-dp-flex-row kt-dp-footer\">\n" +
+    "  <div class=\"kt-dp-flex-cell\">\n" +
+    "    <button class=\"kt-dp-date\"\n" +
+    "            ng-click=\"setCurrentPicker('range')\"\n" +
+    "            ng-class=\"{'kt-dp-date--selected': isCurrentPicker('range')}\">Select Range</button>\n" +
+    "  </div>\n" +
+    "</div>\n" +
+    "\n" +
     "\n" +
     "");
+  $templateCache.put("html/kt-date-range-select.html",
+    "<div class=\"kt-dp-flex-row\" ng-repeat=\"range in ranges\">\n" +
+    "  <div class=\"kt-dp-flex-cell\">\n" +
+    "    <button class=\"kt-dp-date\" ng-click=\"setRange(range)\">{{range | ktDateRangeDisplay}}</button>\n" +
+    "  </div>\n" +
+    "</div>");
   $templateCache.put("html/kt-day-header.html",
     "<div class=\"kt-dp-flex-row\">\n" +
     "  <div class=\"kt-dp-flex-cell\" ng-repeat=\"dayHeader in dayHeaders\">\n" +
