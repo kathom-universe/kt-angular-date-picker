@@ -16,6 +16,18 @@
       padding     : 0;
     }
 
+    kt-date-picker-icon {
+      align-items     : center;
+      display         : flex;
+      height          : 100%;
+      justify-content : center;
+
+      svg {
+        height : 18px;
+        width  : 18px;
+      }
+    }
+
     svg {
       fill : theme-property($theme, 'color');
     }
@@ -51,6 +63,10 @@
       &--selected {
         background-color: theme-property($theme, 'background-selected');
         color : theme-property($theme, 'background');
+
+        svg {
+          fill: theme-property($theme, 'background');
+        }
       }
 
       &:disabled {

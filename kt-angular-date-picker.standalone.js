@@ -577,23 +577,22 @@
 
 
 
-  angular
+  angular.module('kt.datePicker').directive('ktDatePickerIcon', function ($document, $templateCache) {
+    var svg = angular.element($templateCache.get('html/kt-date-picker-icons.svg')).addClass('ng-hide');
 
-    .module('kt.datePicker')
+    angular.element($document[0].body).append(svg);
 
-    .directive('ktDatePickerNextIcon', function () {
-      return {
-        restrict: 'E',
-        template: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path d="M9 3L7.94 4.06l4.19 4.19H3v1.5h9.13l-4.19 4.19L9 15l6-6z"></path></svg>'
-      };
-    })
+    return {
+      restrict: 'E',
+      scope: {
+        icon: '@'
+      },
+      template: '<svg><use xlink:href="{{icon}}"></use></svg>',
+      link: function (scope, elem) {
 
-    .directive('ktDatePickerPreviousIcon', function () {
-      return {
-        restrict: 'E',
-        template: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path d="M15 8.25H5.87l4.19-4.19L9 3 3 9l6 6 1.06-1.06-4.19-4.19H15v-1.5z"></path></svg>'
-      };
-    });
+      }
+    };
+  });
 
 
 
@@ -1389,7 +1388,9 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "  <div class=\"kt-dp-flex-cell\">\n" +
     "    <button class=\"kt-dp-date\"\n" +
     "            ng-click=\"setCurrentPicker('range')\"\n" +
-    "            ng-class=\"{'kt-dp-date--selected': isCurrentPicker('range')}\">Select Range</button>\n" +
+    "            ng-class=\"{'kt-dp-date--selected': isCurrentPicker('range')}\">\n" +
+    "      <kt-date-picker-icon icon=\"#date_range_24\"></kt-date-picker-icon>\n" +
+    "    </button>\n" +
     "  </div>\n" +
     "</div>\n" +
     "\n" +
@@ -1413,7 +1414,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "    <button\n" +
     "        type=\"button\" class=\"kt-dp-navigation__button kt-button--block\"\n" +
     "        ng-click=\"previousMonth()\" ng-disabled=\"!hasPreviousMonth()\">\n" +
-    "      <kt-date-picker-previous-icon></kt-date-picker-previous-icon>\n" +
+    "      <kt-date-picker-icon icon=\"#chevron_left_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
@@ -1428,7 +1429,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "    <button\n" +
     "        type=\"button\" class=\"kt-dp-navigation__button kt-button--block\"\n" +
     "        ng-click=\"nextMonth()\" ng-disabled=\"!hasNextMonth()\">\n" +
-    "      <kt-date-picker-next-icon></kt-date-picker-next-icon>\n" +
+    "      <kt-date-picker-icon icon=\"#chevron_right_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
     "</div>\n" +
@@ -1453,7 +1454,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "  <div class=\"kt-dp-flex-cell\">\n" +
     "    <button type=\"button\" class=\"kt-dp-navigation__button kt-button--block\"\n" +
     "            ng-click=\"previousYear()\" ng-disabled=\"!hasPreviousYear()\">\n" +
-    "      <kt-date-picker-previous-icon></kt-date-picker-previous-icon>\n" +
+    "      <kt-date-picker-icon icon=\"#chevron_left_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
@@ -1463,7 +1464,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "  <div class=\"kt-dp-flex-cell\">\n" +
     "    <button type=\"button\" class=\"kt-dp-navigation__button kt-button--block\"\n" +
     "            ng-click=\"nextYear()\" ng-disabled=\"!hasNextYear()\">\n" +
-    "      <kt-date-picker-next-icon></kt-date-picker-next-icon>\n" +
+    "      <kt-date-picker-icon icon=\"#chevron_right_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
     "</div>\n" +
@@ -1514,7 +1515,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "  <div class=\"kt-dp-flex-cell\">\n" +
     "    <button type=\"button\" class=\"kt-dp-navigation__button kt-button--block\"\n" +
     "            ng-click=\"previousDecade()\" ng-disabled=\"!hasPreviousDecade()\">\n" +
-    "      <kt-date-picker-previous-icon></kt-date-picker-previous-icon>\n" +
+    "      <kt-date-picker-icon icon=\"#chevron_left_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
@@ -1525,7 +1526,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "  <div class=\"kt-dp-flex-cell\">\n" +
     "    <button type=\"button\" class=\"kt-dp-navigation__button kt-button--block\"\n" +
     "            ng-click=\"nextDecade()\" ng-disabled=\"!hasNextDecade()\">\n" +
-    "      <kt-date-picker-next-icon></kt-date-picker-next-icon>\n" +
+    "      <kt-date-picker-icon icon=\"#chevron_right_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
     "</div>\n" +
@@ -1543,5 +1544,21 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "  </div>\n" +
     "</div>\n" +
     "");
+  $templateCache.put("html/kt-date-picker-icons.svg",
+    "<svg xmlns=\"http://www.w3.org/2000/svg\">\n" +
+    "    <symbol viewBox=\"0 0 24 24\" id=\"date_range_24\">\n" +
+    "        <title>date_range_24</title>\n" +
+    "        <path d=\"M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z\"\n" +
+    "        />\n" +
+    "    </symbol>\n" +
+    "    <symbol viewBox=\"0 0 18 18\" id=\"chevron_left_18\">\n" +
+    "        <title>chevron_left_18</title>\n" +
+    "        <path d=\"M11.56 5.56L10.5 4.5 6 9l4.5 4.5 1.06-1.06L8.12 9z\" />\n" +
+    "    </symbol>\n" +
+    "    <symbol viewBox=\"0 0 18 18\" id=\"chevron_right_18\">\n" +
+    "        <title>chevron_right_18</title>\n" +
+    "        <path d=\"M7.5 4.5L6.44 5.56 9.88 9l-3.44 3.44L7.5 13.5 12 9z\" />\n" +
+    "    </symbol>\n" +
+    "</svg>");
 }]);
 })();

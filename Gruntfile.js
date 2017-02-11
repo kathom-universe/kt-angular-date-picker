@@ -51,7 +51,7 @@ module.exports = function(grunt) {
         }
       },
       main: {
-        src: ['html/**/*.html'],
+        src: ['html/**/*.html', 'html/**/*.svg'],
         dest: 'js/template/template-cache.js'
       }
     },
@@ -86,6 +86,27 @@ module.exports = function(grunt) {
           ]
         }
       }
+    },
+    svgstore: {
+      default : {
+        files: {
+          'html/kt-date-picker-icons.svg': [
+            'bower_components/material-design-icons/action/svg/production/ic_date_range_24px.svg',
+            'bower_components/material-design-icons/navigation/svg/production/ic_chevron_left_18px.svg',
+            'bower_components/material-design-icons/navigation/svg/production/ic_chevron_right_18px.svg'
+          ]
+        },
+        options: {
+          formatting: {
+            wrap_line_length: 120
+          },
+          convertNameToId: function(name) {
+            name = name.slice(3); // remove the ic_ prefix
+            name = name.slice(0, -2); // remove the px
+            return name;
+          }
+        }
+      }
     }
   });
 
@@ -94,6 +115,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-svgstore');
 
   grunt.registerTask('build-css', ['sass', 'postcss']);
   grunt.registerTask('default', ['watch']);
