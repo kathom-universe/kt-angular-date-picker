@@ -1,30 +1,9 @@
 @import "themes";
-@import "day-picker";
-
-@mixin _kt-month-picker-box($theme) {
-  .kt-dp--theme-#{$theme} kt-month-picker {
-    display : block;
-    height  : kt-day-picker-height($theme);
-  }
-
-  kt-month-picker.kt-dp--theme-#{$theme} {
-    display : inline-block;
-  }
-
-  .kt-dp--theme-#{$theme} kt-month-picker,
-  kt-month-picker.kt-dp--theme-#{$theme} {
-    padding : theme-property($theme, 'padding');
-  }
-}
-
-@mixin _kt-month-picker-background($theme) {
-  .kt-dp--theme-#{$theme} kt-month-picker,
-  kt-month-picker.kt-dp--theme-#{$theme} {
-    background : theme-property($theme, 'background');
-  }
-}
 
 @mixin _kt-month-picker($theme) {
-  @include _kt-month-picker-background($theme);
-  @include _kt-month-picker-box($theme);
+  kt-month-picker.kt-dp--theme-#{$theme} {
+    background : theme-property($theme, 'background');
+    display : inline-block;
+    padding : theme-property($theme, 'padding');
+  }
 }

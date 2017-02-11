@@ -5,13 +5,13 @@ $kt-dp-themes : (
     background-disabled : #FFCCCC,
     background-hover    : #CCCCCC,
     background-selected : #106CC8,
-    cell-size           : 40px,
-    circle              : false,
+    cell-size           : 2rem,
     color               : #222222,
     color-muted         : #757575,
-    margin-day-header   : 5px,
-    margin-navigation   : 5px,
-    padding             : 10px
+    icon-size           : 1rem,
+    margin-day-header   : .5rem,
+    margin-navigation   : .5rem,
+    padding             : .5rem
   ),
   material-dark: (
     animation-duration  : 0.25s,
@@ -19,13 +19,13 @@ $kt-dp-themes : (
     background-disabled : #6C4848,
     background-hover    : #555555,
     background-selected : #80CBC4,
-    cell-size           : 30px,
-    circle-selected     : true,
+    cell-size           : 2rem,
     color               : #FFFFFF,
     color-muted         : #C6C6C6,
-    margin-day-header   : 5px,
-    margin-navigation   : 5px,
-    padding             : 10px
+    icon-size           : 1rem,
+    margin-day-header   : .5rem,
+    margin-navigation   : .5rem,
+    padding             : .5rem
   )
 );
 

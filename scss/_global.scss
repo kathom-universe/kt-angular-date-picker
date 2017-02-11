@@ -23,8 +23,8 @@
       justify-content : center;
 
       svg {
-        height : 18px;
-        width  : 18px;
+        height : theme-property($theme, 'icon-size');
+        width  : theme-property($theme, 'icon-size');
       }
     }
 
@@ -33,7 +33,7 @@
     }
 
     .kt-dp-flex-row {
-      display: flex;
+      display : flex;
     }
 
     .kt-dp-flex-cell {
@@ -52,38 +52,39 @@
     }
 
     .kt-dp-navigation__button {
-      height: theme-property($theme, 'cell-size');
+      height : theme-property($theme, 'cell-size');
     }
 
     .kt-dp-date {
-      @extend .kt-button--block;
-      height : theme-property($theme, 'cell-size');
-      min-width: theme-property($theme, 'cell-size');
+      display   : block;
+      height    : theme-property($theme, 'cell-size');
+      min-width : theme-property($theme, 'cell-size');
+      width     : 100%;
 
       &--selected {
-        background-color: theme-property($theme, 'background-selected');
-        color : theme-property($theme, 'background');
+        background-color : theme-property($theme, 'background-selected');
+        color            : theme-property($theme, 'background');
 
         svg {
-          fill: theme-property($theme, 'background');
+          fill : theme-property($theme, 'background');
         }
       }
 
       &:disabled {
-        background-color: theme-property($theme, 'background-disabled');
+        background-color : theme-property($theme, 'background-disabled');
       }
-  }
+    }
 
     .kt-dp-date--overflow:not(.kt-dp-date--selected) {
-      color: theme-property($theme, 'color-muted');
+      color : theme-property($theme, 'color-muted');
     }
 
     button:disabled {
-      cursor: default;
+      cursor : default;
     }
 
     button:not(:disabled):not(.kt-dp-date--selected):hover {
-      background-color: theme-property($theme, 'background-hover');
+      background-color : theme-property($theme, 'background-hover');
     }
   }
 }

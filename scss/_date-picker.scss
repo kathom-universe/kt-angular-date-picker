@@ -9,40 +9,40 @@
   @return kt-day-picker-width($theme, true);
 }
 
-@mixin _kt-date-picker-height($theme) {
-  .kt-dp--theme-#{$theme} kt-date-picker {
-    height : kt-date-picker-height($theme);
-  }
-
-  kt-date-picker.kt-dp--theme-#{$theme} {
-    height : kt-date-picker-height($theme);
-  }
-}
-
 @mixin _kt-date-picker-box($theme) {
-  @include _kt-date-picker-height($theme);
+  .kt-dp--theme-#{$theme} kt-date-picker,
+  kt-date-picker.kt-dp--theme-#{$theme} {
+    overflow : hidden;
+    position : relative;
+
+    &, > * {
+      height : kt-date-picker-height($theme);
+    }
+
+    > * {
+      display  : block;
+      left     : 0;
+      right    : 0;
+      padding  : theme-property($theme, 'padding');
+      position : absolute;
+    }
+  }
 
   .kt-dp--theme-#{$theme} kt-date-picker {
-    display: block;
+    display : block;
   }
 
   kt-date-picker.kt-dp--theme-#{$theme} {
-    display : inline-block;
-    width   : kt-date-picker-width($theme);
+    background : theme-property($theme, 'background');
+    display    : inline-block;
+    min-width  : kt-date-picker-width($theme);
   }
 }
 
 @mixin _kt-date-picker-animation($theme) {
   .kt-dp--theme-#{$theme} kt-date-picker,
   kt-date-picker.kt-dp--theme-#{$theme} {
-    overflow : hidden;
-    position : relative;
-
     > * {
-      position : absolute;
-      left     : 0;
-      right    : 0;
-
       &.ng-hide-add {
         animation : slideOutUp theme-property($theme, 'animation-duration');
 
