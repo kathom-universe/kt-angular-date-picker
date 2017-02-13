@@ -92,6 +92,7 @@ module.exports = function(grunt) {
         files: {
           'html/kt-date-picker-icons.svg': [
             'bower_components/material-design-icons/action/svg/production/ic_date_range_24px.svg',
+            'bower_components/material-design-icons/action/svg/production/ic_done_24px.svg',
             'bower_components/material-design-icons/navigation/svg/production/ic_chevron_left_18px.svg',
             'bower_components/material-design-icons/navigation/svg/production/ic_chevron_right_18px.svg'
           ]

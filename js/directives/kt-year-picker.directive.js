@@ -27,15 +27,15 @@
         require    : ['ngModel', '?^ktDatePicker'],
         templateUrl: 'html/kt-year-picker.html',
         scope      : {
-          minDate: '=',
-          maxDate: '=',
-          format : '@'
+          options: '='
         },
         link       : function (scope, element, attributes, controllers) {
           var ngModelController = controllers[0];
           var ktDatePicker = controllers[1];
           var decade = getDecade(scope.date ? scope.date.year() : moment().clone().year());
           var yearsPerRow = 3;
+
+          scope.options = scope.options || {};
 
           function chunk(arr, size) {
             var newArr = [];
@@ -50,16 +50,16 @@
             chunkedYears : chunk(getYears(decade), yearsPerRow)
           };
 
-          scope.date = ktDateBounds.getMomentWithinBounds(scope.date, scope.minDate, scope.maxDate, {
+          scope.date = ktDateBounds.getMomentWithinBounds(scope.date, scope.options.minDate, scope.options.maxDate, {
             precision: 'year',
             inclusivity: '[]',
-            format: scope.format
+            format: scope.options.format
           });
 
           scope.$watch(function () {
             return ngModelController.$modelValue;
           }, function(newValue) {
-            scope.date = moment(newValue, scope.format);
+            scope.date = moment(newValue, scope.options.format);
             if (scope.date.year() < scope.yearPicker.decade.start || scope.date.year() > scope.yearPicker.decade.end) {
               scope.yearPicker.decade = getDecade(scope.date.year());
               scope.yearPicker.chunkedYears = chunk(getYears(scope.yearPicker.decade), yearsPerRow);
@@ -69,14 +69,14 @@
           scope.selectYear = function (year) {
             var date = scope.date.clone().year(year);
 
-            scope.date = ktDateBounds.getMomentWithinBounds(date, scope.minDate, scope.maxDate, {
+            scope.date = ktDateBounds.getMomentWithinBounds(date, scope.options.minDate, scope.options.maxDate, {
               precision: 'day',
               inclusivity: '[]',
-              format: scope.format,
+              format: scope.options.format,
               roundTo: 'year'
             });
 
-            ngModelController.$setViewValue(scope.format ? scope.date.format(scope.format) : scope.date);
+            ngModelController.$setViewValue(scope.options.format ? scope.date.format(scope.options.format) : scope.date);
 
             if (ktDatePicker) {
               ktDatePicker.requestPicker('month');
@@ -92,8 +92,8 @@
           scope.hasPreviousDecade = function () {
             var date = moment().clone().year(scope.yearPicker.decade.start);
             date.subtract(1, 'years');
-            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, {
-              precision: 'year', inclusivity: '[]', format: scope.format
+            return ktDateBounds.isDateWithinBounds(date, scope.options.minDate, scope.options.maxDate, {
+              precision: 'year', inclusivity: '[]', format: scope.options.format
             });
           };
 
@@ -106,8 +106,8 @@
           scope.hasNextDecade = function () {
             var date = moment().clone().year(scope.yearPicker.decade.end);
             date.add(1, 'years');
-            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, {
-              precision: 'year', inclusivity: '[]', format: scope.format
+            return ktDateBounds.isDateWithinBounds(date, scope.options.minDate, scope.options.maxDate, {
+              precision: 'year', inclusivity: '[]', format: scope.options.format
             });
           };
 
@@ -126,8 +126,8 @@
           scope.isInMinMaxRange = function (year) {
             var date = moment().clone().year(year);
 
-            return ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, {
-              precision: 'year', inclusivity: '[]', format: scope.format
+            return ktDateBounds.isDateWithinBounds(date, scope.options.minDate, scope.options.maxDate, {
+              precision: 'year', inclusivity: '[]', format: scope.options.format
             });
           };
         }

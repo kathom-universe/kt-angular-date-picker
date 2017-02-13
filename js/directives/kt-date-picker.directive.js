@@ -10,10 +10,7 @@
         restrict   : 'E',
         scope      : {
           ngModel  : '=',
-          minDate: '=',
-          maxDate: '=',
-          format : '@',
-          onDateSelect: '&'
+          options  : '='
         },
         templateUrl: 'html/kt-date-picker.html',
         controller : function ($scope) {

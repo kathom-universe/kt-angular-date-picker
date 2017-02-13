@@ -7,15 +7,15 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "");
   $templateCache.put("html/kt-date-picker.html",
     "<kt-day-picker\n" +
-    "    ng-model=\"ngModel\" min-date=\"minDate\" max-date=\"maxDate\" format=\"{{format}}\"\n" +
+    "    ng-model=\"ngModel\" options=\"options\"\n" +
     "    ng-show=\"isCurrentPicker('day')\">\n" +
     "</kt-day-picker>\n" +
     "<kt-month-picker\n" +
-    "    ng-model=\"ngModel\" min-date=\"minDate\" max-date=\"maxDate\" format=\"{{format}}\"\n" +
+    "    ng-model=\"ngModel\" options=\"options\"\n" +
     "    ng-show=\"isCurrentPicker('month')\">\n" +
     "</kt-month-picker>\n" +
     "<kt-year-picker\n" +
-    "    ng-model=\"ngModel\" min-date=\"minDate\" max-date=\"maxDate\" format=\"{{format}}\"\n" +
+    "    ng-model=\"ngModel\" options=\"options\"\n" +
     "    ng-show=\"isCurrentPicker('year')\">\n" +
     "</kt-year-picker>\n" +
     "");
@@ -31,28 +31,28 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "    <button class=\"kt-dp-date\"\n" +
     "            ng-click=\"setCurrentPicker('start')\"\n" +
     "            ng-class=\"{'kt-dp-date--selected': isCurrentPicker('start')}\">\n" +
-    "      {{getDisplayedDate(startDate)}}\n" +
+    "      {{getDisplayedDate(dateRangePicker.startDate)}}\n" +
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
     "    <button class=\"kt-dp-date\"\n" +
     "            ng-click=\"setCurrentPicker('end')\"\n" +
     "            ng-class=\"{'kt-dp-date--selected': isCurrentPicker('end')}\">\n" +
-    "      {{getDisplayedDate(endDate)}}\n" +
+    "      {{getDisplayedDate(dateRangePicker.endDate)}}\n" +
     "    </button>\n" +
     "  </div>\n" +
     "</div>\n" +
     "\n" +
     "<div class=\"kt-dp-picker-container\">\n" +
-    "  <kt-date-range-select start-date=\"startDate\" end-date=\"endDate\" options=\"options\"\n" +
+    "  <kt-date-range-select start-date=\"dateRangePicker.startDate\" end-date=\"dateRangePicker.endDate\" options=\"options\"\n" +
     "                        ng-show=\"isCurrentPicker('range')\">\n" +
     "  </kt-date-range-select>\n" +
     "\n" +
-    "  <kt-date-picker ng-model=\"startDate\" min-date=\"minDate\" max-date=\"maxDate\" format=\"{{format}}\"\n" +
+    "  <kt-date-picker ng-model=\"dateRangePicker.startDate\" options=\"startRangeOptions\"\n" +
     "                  ng-show=\"isCurrentPicker('start')\">\n" +
     "  </kt-date-picker>\n" +
     "\n" +
-    "  <kt-date-picker ng-model=\"endDate\" min-date=\"startDate\" max-date=\"maxDate\" format=\"{{format}}\"\n" +
+    "  <kt-date-picker ng-model=\"dateRangePicker.endDate\" options=\"endRangeOptions\"\n" +
     "                  ng-show=\"isCurrentPicker('end')\">\n" +
     "  </kt-date-picker>\n" +
     "</div>\n" +
@@ -65,12 +65,17 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "      <kt-date-picker-icon icon=\"#date_range_24\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
+    "  <div class=\"kt-dp-flex-cell\">\n" +
+    "    <button class=\"kt-dp-date\" ng-click=\"applyChanges()\">\n" +
+    "      <kt-date-picker-icon icon=\"#done_24\"></kt-date-picker-icon>\n" +
+    "    </button>\n" +
+    "  </div>\n" +
     "</div>\n" +
     "\n" +
     "\n" +
     "");
   $templateCache.put("html/kt-date-range-select.html",
-    "<div class=\"kt-dp-flex-row\" ng-repeat=\"range in ranges\">\n" +
+    "<div class=\"kt-dp-flex-row\" ng-repeat=\"range in options.ranges\">\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
     "    <button class=\"kt-dp-date\" ng-click=\"setRange(range)\">{{range | ktDateRangeDisplay}}</button>\n" +
     "  </div>\n" +
@@ -223,6 +228,10 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "        <title>date_range_24</title>\n" +
     "        <path d=\"M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z\"\n" +
     "        />\n" +
+    "    </symbol>\n" +
+    "    <symbol viewBox=\"0 0 24 24\" id=\"done_24\">\n" +
+    "        <title>done_24</title>\n" +
+    "        <path d=\"M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z\" />\n" +
     "    </symbol>\n" +
     "    <symbol viewBox=\"0 0 18 18\" id=\"chevron_left_18\">\n" +
     "        <title>chevron_left_18</title>\n" +

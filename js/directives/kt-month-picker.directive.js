@@ -21,15 +21,15 @@
         restrict   : 'E',
         require: ['ngModel', '?^ktDatePicker'],
         scope      : {
-          minDate: '=',
-          maxDate: '=',
-          format : '@'
+          options: '='
         },
         templateUrl: 'html/kt-month-picker.html',
         link       : function (scope, element, attributes, controllers) {
           var ngModelController = controllers[0];
           var ktDatePicker = controllers[1];
           var monthsPerRow = 3;
+
+          scope.options = scope.options || {};
 
           function chunk(arr, size) {
             var newArr = [];
@@ -44,16 +44,16 @@
             monthChunks: chunk(getMonths(), monthsPerRow)
           };
 
-          scope.date = ktDateBounds.getMomentWithinBounds(scope.date, scope.minDate, scope.maxDate, {
+          scope.date = ktDateBounds.getMomentWithinBounds(scope.date, scope.options.minDate, scope.options.maxDate, {
             precision: 'month',
             inclusivity: '[]',
-            format: scope.format
+            format: scope.options.format
           });
 
           scope.$watch(function () {
             return ngModelController.$modelValue;
           }, function(newValue) {
-            scope.date = moment(newValue, scope.format);
+            scope.date = moment(newValue, scope.options.format);
             scope.monthPicker.year = scope.date.year();
           });
 
@@ -63,23 +63,23 @@
 
           scope.isInMinMaxRange = function (month) {
             var date = moment().clone().year(scope.monthPicker.year).month(month);
-            var minDate = scope.minDate ? moment(scope.minDate, scope.format) : undefined;
-            var maxDate = scope.maxDate ? moment(scope.maxDate, scope.format) : undefined;
 
-            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, {precision: 'month', inclusivity: '[]'});
+            return ktDateBounds.isDateWithinBounds(date, scope.options.minDate, scope.options.maxDate, {
+              precision: 'month', inclusivity: '[]', format: scope.options.format
+            });
           };
 
           scope.selectMonth = function (month) {
             var date = scope.date.clone().year(scope.monthPicker.year).month(month);
 
-            scope.date = ktDateBounds.getMomentWithinBounds(date, scope.minDate, scope.maxDate, {
+            scope.date = ktDateBounds.getMomentWithinBounds(date, scope.options.minDate, scope.options.maxDate, {
               precision: 'day',
               inclusivity: '[]',
-              format: scope.format,
+              format: scope.options.format,
               roundTo: 'month'
             });
 
-            ngModelController.$setViewValue(scope.format ? scope.date.format(scope.format) : scope.date);
+            ngModelController.$setViewValue(scope.options.format ? scope.date.format(scope.options.format) : scope.date);
 
             if (ktDatePicker) {
               ktDatePicker.requestPicker('day');
@@ -93,10 +93,10 @@
           scope.hasPreviousYear = function () {
             var date = moment({year: scope.monthPicker.year});
             date.subtract(1, 'year');
-            var minDate = scope.minDate ? moment(scope.minDate, scope.format) : undefined;
-            var maxDate = scope.maxDate ? moment(scope.maxDate, scope.format) : undefined;
 
-            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, {precision: 'year', inclusivity: '[]'});
+            return ktDateBounds.isDateWithinBounds(date, scope.options.minDate, scope.options.maxDate, {
+              precision: 'year', inclusivity: '[]', format: scope.options.format
+            });
           };
 
           scope.nextYear = function () {
@@ -106,10 +106,10 @@
           scope.hasNextYear = function () {
             var date = moment({year: scope.monthPicker.year});
             date.add(1, 'year');
-            var minDate = scope.minDate ? moment(scope.minDate, scope.format) : undefined;
-            var maxDate = scope.maxDate ? moment(scope.maxDate, scope.format) : undefined;
 
-            return ktDateBounds.isDateWithinBounds(date, minDate, maxDate, {precision: 'year', inclusivity: '[]'});
+            return ktDateBounds.isDateWithinBounds(date, scope.options.minDate, scope.options.maxDate, {
+              precision: 'year', inclusivity: '[]', format: scope.options.format
+            });
           };
 
           scope.yearClick = function () {

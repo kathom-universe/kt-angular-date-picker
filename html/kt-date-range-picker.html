@@ -3,28 +3,28 @@
     <button class="kt-dp-date"
             ng-click="setCurrentPicker('start')"
             ng-class="{'kt-dp-date--selected': isCurrentPicker('start')}">
-      {{getDisplayedDate(startDate)}}
+      {{getDisplayedDate(dateRangePicker.startDate)}}
     </button>
   </div>
   <div class="kt-dp-flex-cell">
     <button class="kt-dp-date"
             ng-click="setCurrentPicker('end')"
             ng-class="{'kt-dp-date--selected': isCurrentPicker('end')}">
-      {{getDisplayedDate(endDate)}}
+      {{getDisplayedDate(dateRangePicker.endDate)}}
     </button>
   </div>
 </div>
 
 <div class="kt-dp-picker-container">
-  <kt-date-range-select start-date="startDate" end-date="endDate" options="options"
+  <kt-date-range-select start-date="dateRangePicker.startDate" end-date="dateRangePicker.endDate" options="options"
                         ng-show="isCurrentPicker('range')">
   </kt-date-range-select>
 
-  <kt-date-picker ng-model="startDate" min-date="minDate" max-date="maxDate" format="{{format}}"
+  <kt-date-picker ng-model="dateRangePicker.startDate" options="startRangeOptions"
                   ng-show="isCurrentPicker('start')">
   </kt-date-picker>
 
-  <kt-date-picker ng-model="endDate" min-date="startDate" max-date="maxDate" format="{{format}}"
+  <kt-date-picker ng-model="dateRangePicker.endDate" options="endRangeOptions"
                   ng-show="isCurrentPicker('end')">
   </kt-date-picker>
 </div>
@@ -35,6 +35,11 @@
             ng-click="setCurrentPicker('range')"
             ng-class="{'kt-dp-date--selected': isCurrentPicker('range')}">
       <kt-date-picker-icon icon="#date_range_24"></kt-date-picker-icon>
+    </button>
+  </div>
+  <div class="kt-dp-flex-cell">
+    <button class="kt-dp-date" ng-click="applyChanges()">
+      <kt-date-picker-icon icon="#done_24"></kt-date-picker-icon>
     </button>
   </div>
 </div>
