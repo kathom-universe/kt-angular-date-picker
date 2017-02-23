@@ -2,30 +2,36 @@ $kt-dp-themes : (
   material-light: (
     animation-duration  : 0.25s,
     background          : #FFFFFF,
-    background-disabled : #FFCCCC,
+    background-disabled : transparent,
     background-hover    : #CCCCCC,
     background-selected : #106CC8,
     cell-size           : 2rem,
     color               : #222222,
+    color-disabled      : red,
     color-muted         : #757575,
+    font-family         : inherit,
     icon-size           : 1rem,
     margin-day-header   : .5rem,
     margin-navigation   : .5rem,
-    padding             : .5rem
+    padding             : .5rem,
+    round-buttons       : true
   ),
   material-dark: (
     animation-duration  : 0.25s,
     background          : #424242,
-    background-disabled : #6C4848,
+    background-disabled : transparent,
     background-hover    : #555555,
     background-selected : #80CBC4,
     cell-size           : 2rem,
     color               : #FFFFFF,
+    color-disabled      : red,
     color-muted         : #C6C6C6,
+    font-family         : inherit,
     icon-size           : 1rem,
     margin-day-header   : .5rem,
     margin-navigation   : .5rem,
-    padding             : .5rem
+    padding             : .5rem,
+    round-buttons       : true
   )
 );
 

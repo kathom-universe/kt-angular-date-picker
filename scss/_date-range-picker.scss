@@ -12,9 +12,6 @@
 @mixin _kt-date-range-navigation($theme) {
   .kt-dp--theme-#{$theme} .kt-dp-range-navigation {
     margin-bottom : theme-property($theme, 'margin-navigation');
-    padding-left  : theme-property($theme, 'padding');
-    padding-right : theme-property($theme, 'padding');
-    padding-top   : theme-property($theme, 'padding');
   }
 }
 

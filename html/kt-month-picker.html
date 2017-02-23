@@ -1,17 +1,16 @@
 <div class="kt-dp-flex-row kt-dp-navigation">
   <div class="kt-dp-flex-cell">
-    <button type="button" class="kt-dp-navigation__button kt-button--block"
-            ng-click="previousYear()" ng-disabled="!hasPreviousYear()">
+    <button type="button" class="kt-dp-button" ng-click="previousYear()" ng-if="hasPreviousYear()">
       <kt-date-picker-icon icon="#chevron_left_18"></kt-date-picker-icon>
     </button>
   </div>
   <div class="kt-dp-flex-cell">
-    <button type="button" class="kt-dp-navigation__button kt-button--block"
-            ng-click="yearClick()" ng-disabled="!canChooseYear()">{{monthPicker.year}}</button>
+    <button type="button" class="kt-dp-button" ng-click="yearClick()" ng-disabled="!canChooseYear()">
+      {{monthPicker.year}}
+    </button>
   </div>
   <div class="kt-dp-flex-cell">
-    <button type="button" class="kt-dp-navigation__button kt-button--block"
-            ng-click="nextYear()" ng-disabled="!hasNextYear()">
+    <button type="button" class="kt-dp-button" ng-click="nextYear()" ng-if="hasNextYear()">
       <kt-date-picker-icon icon="#chevron_right_18"></kt-date-picker-icon>
     </button>
   </div>
@@ -19,9 +18,9 @@
 <div class="kt-dp-flex-row" ng-repeat="monthChunk in monthPicker.monthChunks">
   <div class="kt-dp-flex-cell" ng-repeat="month in monthChunk">
     <button type="button"
-            class="kt-dp-date"
+            class="kt-dp-button"
             ng-click="selectMonth(month)"
-            ng-class="{'kt-dp-date--selected': isSelected(month)}"
+            ng-class="{'kt-dp-button--selected': isSelected(month)}"
             ng-disabled="!isInMinMaxRange(month)">
       {{month | monthFormat}}
     </button>

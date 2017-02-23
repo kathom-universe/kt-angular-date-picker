@@ -19,15 +19,17 @@
         };
 
         $scope.startRangeOptions = {
-          minDate: $scope.options.minDate,
-          maxDate: $scope.options.maxDate,
-          format : $scope.options.format
+          minDate        : $scope.options.minDate,
+          maxDate        : $scope.options.maxDate,
+          format         : $scope.options.format,
+          overflowEnabled: $scope.options.overflowEnabled
         };
 
         $scope.endRangeOptions = {
-          minDate: angular.copy($scope.dateRangePicker.startDate),
-          maxDate: $scope.options.maxDate,
-          format : $scope.options.format
+          minDate        : angular.copy($scope.dateRangePicker.startDate),
+          maxDate        : $scope.options.maxDate,
+          format         : $scope.options.format,
+          overflowEnabled: $scope.options.overflowEnabled
         };
 
         var currentPicker = 'start';
