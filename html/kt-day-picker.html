@@ -1,6 +1,6 @@
 <div class="kt-dp-flex-row kt-dp-navigation">
   <div class="kt-dp-flex-cell">
-    <button type="button" class="kt-dp-button" ng-click="previousMonth()" ng-if="hasPreviousMonth()">
+    <button type="button" class="kt-dp-button" ng-click="previousMonth()" ng-show="hasPreviousMonth()">
       <kt-date-picker-icon icon="#chevron_left_18"></kt-date-picker-icon>
     </button>
   </div>
@@ -11,7 +11,7 @@
     </button>
   </div>
   <div class="kt-dp-flex-cell">
-    <button type="button" class="kt-dp-button" ng-click="nextMonth()" ng-if="hasNextMonth()">
+    <button type="button" class="kt-dp-button" ng-click="nextMonth()" ng-show="hasNextMonth()">
       <kt-date-picker-icon icon="#chevron_right_18"></kt-date-picker-icon>
     </button>
   </div>

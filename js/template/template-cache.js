@@ -1,10 +1,4 @@
-angular.module('kt.datePicker').run(['$templateCache', function($templateCache) {
-  $templateCache.put("html/kt-date-picker-input.html",
-    "<div>\n" +
-    "  <input type=\"text\" ng-model=\"dateString\" ng-change=\"dateStringChanged()\" kt-dropdown=\".ktDatePickerInput_{{instanceCount}}\">\n" +
-    "  <kt-date-picker class=\"ktDatePickerInput_{{instanceCount}} kt-dropdown-target\" date=\"date\" min-date=\"minDate\" max-date=\"maxDate\"></kt-date-picker>\n" +
-    "</div>\n" +
-    "");
+angular.module('kt.datePicker').run(['$templateCache', function ($templateCache) {
   $templateCache.put("html/kt-date-picker.html",
     "<kt-day-picker\n" +
     "    ng-model=\"ngModel\" options=\"options\"\n" +
@@ -18,12 +12,6 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "    ng-model=\"ngModel\" options=\"options\"\n" +
     "    ng-show=\"isCurrentPicker('year')\">\n" +
     "</kt-year-picker>\n" +
-    "");
-  $templateCache.put("html/kt-date-range-picker-input.html",
-    "<div>\n" +
-    "  <input type=\"text\" ng-model=\"dateRangeString\" ng-change=\"dateRangeStringChanged()\" kt-dropdown=\".ktDateRangePickerInput_{{instanceCount}}\">\n" +
-    "  <kt-date-range-picker class=\"ktDateRangePickerInput_{{instanceCount}} kt-dropdown-target\" start-date=\"startDate\" end-date=\"endDate\" min-date=\"minDate\" max-date=\"maxDate\"></kt-date-range-picker>\n" +
-    "</div>\n" +
     "");
   $templateCache.put("html/kt-date-range-picker.html",
     "<div class=\"kt-dp-flex-row kt-dp-range-navigation\">\n" +
@@ -89,7 +77,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
   $templateCache.put("html/kt-day-picker.html",
     "<div class=\"kt-dp-flex-row kt-dp-navigation\">\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"previousMonth()\" ng-if=\"hasPreviousMonth()\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"previousMonth()\" ng-show=\"hasPreviousMonth()\">\n" +
     "      <kt-date-picker-icon icon=\"#chevron_left_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
@@ -100,7 +88,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"nextMonth()\" ng-if=\"hasNextMonth()\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"nextMonth()\" ng-show=\"hasNextMonth()\">\n" +
     "      <kt-date-picker-icon icon=\"#chevron_right_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
@@ -125,7 +113,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
   $templateCache.put("html/kt-month-picker.html",
     "<div class=\"kt-dp-flex-row kt-dp-navigation\">\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"previousYear()\" ng-if=\"hasPreviousYear()\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"previousYear()\" ng-show=\"hasPreviousYear()\">\n" +
     "      <kt-date-picker-icon icon=\"#chevron_left_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
@@ -135,7 +123,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"nextYear()\" ng-if=\"hasNextYear()\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"nextYear()\" ng-show=\"hasNextYear()\">\n" +
     "      <kt-date-picker-icon icon=\"#chevron_right_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
@@ -153,49 +141,20 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "</div>\n" +
     "\n" +
     "");
-  $templateCache.put("html/kt-time-picker.html",
-    "<div>\n" +
-    "  <div class=\"kt-date-picker-header\">\n" +
-    "    <div>Hour</div>\n" +
-    "    <div>Minute</div>\n" +
-    "  </div>\n" +
-    "  <div class=\"kt-date-picker-content\">\n" +
-    "    <div class=\"kt-time-picker-outer\">\n" +
-    "      <div class=\"kt-time-picker-inner\" kt-hide-scrollbar>\n" +
-    "        <div class=\"kt-time-picker-cell\"\n" +
-    "             ng-repeat=\"hour in timePicker.hours\"\n" +
-    "             ng-class=\"{'kt-date-picker-selected': isHourSelected(hour)}\">\n" +
-    "          <button type=\"button\" ng-click=\"selectHour(hour)\">{{hour}}</button>\n" +
-    "        </div>\n" +
-    "      </div>\n" +
-    "    </div>\n" +
-    "    <div class=\"kt-time-picker-outer\">\n" +
-    "      <div class=\"kt-time-picker-inner\" kt-hide-scrollbar>\n" +
-    "        <div class=\"kt-time-picker-cell\"\n" +
-    "             ng-repeat=\"minute in timePicker.minutes\"\n" +
-    "             ng-class=\"{'kt-date-picker-selected': isMinuteSelected(minute)}\">\n" +
-    "          <button type=\"button\" ng-click=\"selectMinute(minute)\">{{minute}}</button>\n" +
-    "        </div>\n" +
-    "      </div>\n" +
-    "    </div>\n" +
-    "  </div>\n" +
-    "  <div class=\"kt-date-picker-footer\"></div>\n" +
-    "</div>\n" +
-    "");
   $templateCache.put("html/kt-year-picker.html",
     "<div class=\"kt-dp-flex-row kt-dp-navigation\">\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"previousDecade()\" ng-if=\"hasPreviousDecade()\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"previousDecade()\" ng-show=\"hasPreviousDecade()\">\n" +
     "      <kt-date-picker-icon icon=\"#chevron_left_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" disabled=\"disabled\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button kt-dp-button--preserve-color\" disabled=\"disabled\">\n" +
     "      {{yearPicker.decade.start}} - {{yearPicker.decade.end}}\n" +
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"nextDecade()\" ng-if=\"hasNextDecade()\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"nextDecade()\" ng-show=\"hasNextDecade()\">\n" +
     "      <kt-date-picker-icon icon=\"#chevron_right_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +

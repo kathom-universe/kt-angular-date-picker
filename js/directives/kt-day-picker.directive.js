@@ -33,7 +33,17 @@
         }, function(newValue) {
           scope.date = moment(newValue, scope.options.format);
           resetDayPicker(scope.date);
-        });
+        }, true);
+
+        scope.$watch('options', function (options) {
+          var date = ktDateBounds.getMomentWithinBounds(ngModelController.$modelValue, options.minDate, options.maxDate, {
+            precision  : 'day',
+            inclusivity: '[]',
+            format     : options.format
+          });
+
+          ngModelController.$setViewValue(options.format ? date.format(options.format) : date);
+        }, true);
 
         scope.selectDate = function (date) {
           scope.date.year(date.year()).month(date.month()).date(date.date());

@@ -4,11 +4,6 @@
   describe('Day Picker Service', function () {
     var ktDateBoundsService;
 
-    beforeEach(function () {
-      angular.module('kt.util.style', []);
-      angular.module('kt.dropdown', [])
-    });
-
     beforeEach(module('kt.datePicker'));
 
     beforeEach(inject(function (_ktDateBoundsService_) {

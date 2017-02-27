@@ -42,6 +42,10 @@
           currentPicker = 'start';
         };
 
+        $scope.$watchGroup(['startDate', 'endDate'], function () {
+          $scope.updateBindings();
+        }, true);
+
         $scope.$watch(function () {
           return $scope.dateRangePicker.startDate;
         }, function (startDate) {
@@ -59,6 +63,11 @@
           $scope.endDate = $scope.dateRangePicker.endDate;
         };
 
+        $scope.updateBindings = function () {
+          $scope.dateRangePicker.startDate = angular.copy($scope.startDate);
+          $scope.dateRangePicker.endDate = angular.copy($scope.endDate);
+        };
+
         $scope.isCurrentPicker = function (picker) {
           return currentPicker === picker;
         };
@@ -68,7 +77,7 @@
         };
 
         $scope.getDisplayedDate = function (date) {
-          return moment(date, $scope.options.format).format('D. MMMM YYYY');
+          return moment(date, $scope.options.format).format('DD.MM.YYYY');
         }
       }
     };
@@ -108,55 +117,81 @@
   }]);
 
 
-  angular.module('kt.datePicker').directive('ktDateRangePickerInput', ['ktDateBoundsService', function (ktDateBounds) {
-    var instanceCount = 0;
-
+  angular.module('kt.datePicker').directive('ktDateRangeInput', ['ktDateBoundsService', function (ktDateBounds) {
     return {
-      restrict   : 'E',
+      restrict   : 'A',
+      require    : 'ngModel',
       scope      : {
-        startDate: '=',
-        endDate  : '=',
-        minDate  : '=',
-        maxDate  : '=',
-        format   : '@',
-        divider  : '@'
+        options: '='
       },
-      templateUrl: 'html/kt-date-range-picker-input.html',
-      link       : function (scope) {
-        scope.instanceCount = instanceCount++;
-        scope.dateRangeString = '';
+      link       : function (scope, elem, attrs, ngModelCtrl) {
+        var originalStartMoment;
+        var originalEndMoment;
+        var formatted = false;
 
-        scope.startDate = ktDateBounds.getDateWithinBounds(scope.startDate, scope.minDate, scope.maxDate);
-        scope.endDate = ktDateBounds.getDateWithinBounds(scope.endDate, scope.minDate, scope.maxDate);
+        function getMomentsFromRangeString(rangeString) {
+          var components = rangeString.split(scope.options.divider);
+          return {
+            startDate: moment(components[0], scope.options.inputFormat, true),
+            endDate: moment(components[1], scope.options.inputFormat, true)
+          };
+        }
 
-        scope.$watch('[startDate, endDate]', function (dates) {
-          scope.dateRangeString = dates[0].format(scope.format) + scope.divider + dates[1].format(scope.format);
+        function formatter(modelValue) {
+          formatted = true;
+
+          ngModelCtrl.$setValidity('date-range', true);
+
+          originalStartMoment = angular.copy(
+            ktDateBounds.getMomentWithinBounds(modelValue[scope.options.startProperty], null, null, {format: scope.options.format})
+          );
+
+          originalEndMoment = angular.copy(
+            ktDateBounds.getMomentWithinBounds(modelValue[scope.options.endProperty], null, null, {format: scope.options.format})
+          );
+
+          return originalStartMoment.format(scope.options.inputFormat) + scope.options.divider + originalEndMoment.format(scope.options.inputFormat);
+        }
+
+        ngModelCtrl.$formatters.push(formatter);
+
+        ngModelCtrl.$parsers.push(function (viewValue) {
+          var dates = getMomentsFromRangeString(viewValue);
+          var range = {};
+
+          if (!dates.startDate.isValid() || !dates.endDate.isValid()) {
+            ngModelCtrl.$setValidity('date-range', false);
+            return ngModelCtrl.$modelValue;
+          }
+
+          if (!ktDateBounds.isDateWithinBounds(dates.endDate, dates.startDate)) {
+            ngModelCtrl.$setValidity('date-range-bounds', false);
+            return ngModelCtrl.$modelValue;
+          }
+
+          ngModelCtrl.$setValidity('date-range', true);
+          ngModelCtrl.$setValidity('date-range-bounds', true);
+
+          originalStartMoment = originalStartMoment.year(dates.startDate.year()).month(dates.startDate.month()).date(dates.startDate.date());
+          originalEndMoment = originalEndMoment.year(dates.endDate.year()).month(dates.endDate.month()).date(dates.endDate.date());
+
+          range[scope.options.startProperty] = scope.options.format ? originalStartMoment.format(scope.options.format) : originalStartMoment;
+          range[scope.options.endProperty] = scope.options.format ? originalEndMoment.format(scope.options.format) : originalEndMoment;
+
+          return range;
+        });
+
+        scope.$watch(function () {
+          return ngModelCtrl.$modelValue;
+        }, function (model) {
+          if (!formatted) {
+            ngModelCtrl.$setViewValue(formatter(model));
+            ngModelCtrl.$render();
+          }
+
+          formatted = false;
         }, true);
-
-        scope.dateRangeStringChanged = function () {
-          var dates = scope.dateRangeString.split(scope.divider);
-
-          if (dates.length !== 2) {
-            return;
-          }
-
-          var startDate = moment(dates[0], scope.format, true);
-          var endDate = moment(dates[1], scope.format, true);
-
-          if (!startDate.isValid() || !endDate.isValid()) {
-            return;
-          }
-
-          if (
-            !ktDateBounds.isDateWithinBounds(startDate, scope.minDate, scope.maxDate, {inclusivity: '[]'}) || !ktDateBounds.isDateWithinBounds(endDate, startDate, scope.maxDate, {inclusivity: '[]'})
-          ) {
-            return;
-          }
-
-          scope.startDate.year(startDate.year()).month(startDate.month()).date(startDate.date());
-          scope.endDate.year(endDate.year()).month(endDate.month()).date(endDate.date());
-        };
       }
     };
-  }]);
+  }])
 })();

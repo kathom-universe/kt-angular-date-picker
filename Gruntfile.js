@@ -8,8 +8,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'kt-angular-date-picker.css'           : 'scss/kt-angular-date-picker.scss',
-          'kt-angular-date-picker.standalone.css': 'scss/kt-angular-date-picker.standalone.scss'
+          'kt-angular-date-picker.theme.css': 'scss/kt-angular-date-picker.theme.scss'
         }
       }
     },
@@ -28,7 +27,7 @@ module.exports = function(grunt) {
     },
     watch: {
       css: {
-        files: ['scss/**/*.scss'],
+        files: ['scss/kt-angular-date-picker.theme.scss'],
         tasks: ['build-css']
       },
       html: {
@@ -69,15 +68,6 @@ module.exports = function(grunt) {
         },
         files: {
           'kt-angular-date-picker.js': [
-            'js/kt-date-picker.module.js',
-            'js/services/*.js',
-            'js/filters/*.js',
-            'js/directives/*.js',
-            'js/template/template-cache.js'
-          ],
-          'kt-angular-date-picker.standalone.js': [
-            'bower_components/kt-angular-util/kt-angular-util.js',
-            'bower_components/kt-angular-dropdown/kt-angular-dropdown.js',
             'js/kt-date-picker.module.js',
             'js/services/*.js',
             'js/filters/*.js',

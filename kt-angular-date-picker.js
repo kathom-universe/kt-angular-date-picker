@@ -1,9 +1,7 @@
 (function (){
   'use strict';
 
-
-  angular.module('kt.datePicker', ['kt.util.style', 'kt.dropdown']);
-
+  angular.module('kt.datePicker', []);
 
 
 
@@ -97,7 +95,6 @@
 
       return service;
     });
-
 
 
 
@@ -243,7 +240,6 @@
 
 
 
-
   angular.module('kt.datePicker').filter('ktDateRangeDisplay', ['ktDateRangeLocales', function (dateRangeLocales) {
     return function (rangeName) {
       var dateRangeLocale = dateRangeLocales.filter(function (dateRangeLocale) {
@@ -256,7 +252,6 @@
 
 
 
-
   angular
 
     .module('kt.datePicker')
@@ -266,7 +261,6 @@
         return moment.months()[input];
       };
     }]);
-
 
 
 
@@ -291,12 +285,11 @@
 
 
 
-
   angular
 
     .module('kt.datePicker')
 
-    .directive('ktDatePicker', [function () {
+    .directive('ktDatePicker', ['ktDateBoundsService', function (ktDateBounds) {
       return {
         restrict   : 'E',
         scope      : {
@@ -322,41 +315,79 @@
       }
     }])
 
-    .directive('ktDatePickerInput', ['ktDateBoundsService', function (ktDateBounds) {
-      var instanceCount = 0;
-
+    .directive('ktDateInput', ['ktDateBoundsService', function (ktDateBounds) {
       return {
-        restrict   : 'E',
+        restrict   : 'A',
+        require    : 'ngModel',
         scope      : {
-          date   : '=',
-          minDate: '=',
-          maxDate: '=',
-          format : '@'
+          options: '='
         },
-        templateUrl: 'html/kt-date-picker-input.html',
-        link       : function (scope) {
-          scope.instanceCount = instanceCount++;
-          scope.dateString = '';
+        link       : function (scope, elem, attrs, ngModelCtrl) {
+          var originalMoment;
 
-          scope.date = ktDateBounds.getDateWithinBounds(scope.date, scope.minDate, scope.maxDate);
+          ngModelCtrl.$formatters.push(function (modelValue) {
+            ngModelCtrl.$setValidity('date', true);
 
-          scope.$watch('date', function (date) {
-            scope.dateString = date.format(scope.format);
-          }, true);
+            originalMoment = angular.copy(
+              ktDateBounds.getMomentWithinBounds(modelValue, null, null, {format: scope.options.format})
+            );
 
-          scope.dateStringChanged = function () {
-            var date = moment(scope.dateString, scope.format, true);
+            return originalMoment.format(scope.options.inputFormat);
+          });
 
-            if (!date.isValid() || !ktDateBounds.isDateWithinBounds(date, scope.minDate, scope.maxDate, {inclusivity: '[]'})) {
-              return;
+          ngModelCtrl.$parsers.push(function (viewValue) {
+            var date = moment(viewValue, scope.options.inputFormat, true);
+
+            if (date.isValid()) {
+              date = originalMoment.year(date.year()).month(date.month()).date(date.date());
+              ngModelCtrl.$setValidity('date', true);
+              return scope.options.format ? date.format(scope.options.format) : date;
             }
 
-            scope.date.year(date.year()).month(date.month()).date(date.date());
-          };
+            ngModelCtrl.$setValidity('date', false);
+
+            return ngModelCtrl.$modelValue;
+          });
+        }
+      };
+    }])
+
+    .directive('ktTimeInput', ['ktDateBoundsService', function (ktDateBounds) {
+      return {
+        restrict   : 'A',
+        require    : 'ngModel',
+        scope      : {
+          options: '='
+        },
+        link       : function (scope, elem, attrs, ngModelCtrl) {
+          var originalMoment;
+
+          ngModelCtrl.$formatters.push(function (modelValue) {
+            ngModelCtrl.$setValidity('time', true);
+
+            originalMoment = angular.copy(
+              ktDateBounds.getMomentWithinBounds(modelValue, null, null, {format: scope.options.format})
+            );
+
+            return originalMoment.format(scope.options.inputFormat);
+          });
+
+          ngModelCtrl.$parsers.push(function (viewValue) {
+            var date = moment(viewValue, scope.options.inputFormat, true);
+
+            if (date.isValid()) {
+              date = originalMoment.hour(date.hour()).minute(date.minute());
+              ngModelCtrl.$setValidity('time', true);
+              return scope.options.format ? date.format(scope.options.format) : date;
+            }
+
+            ngModelCtrl.$setValidity('time', false);
+
+            return ngModelCtrl.$modelValue;
+          });
         }
       };
     }]);
-
 
 
 
@@ -402,6 +433,10 @@
           currentPicker = 'start';
         };
 
+        $scope.$watchGroup(['startDate', 'endDate'], function () {
+          $scope.updateBindings();
+        }, true);
+
         $scope.$watch(function () {
           return $scope.dateRangePicker.startDate;
         }, function (startDate) {
@@ -419,6 +454,11 @@
           $scope.endDate = $scope.dateRangePicker.endDate;
         };
 
+        $scope.updateBindings = function () {
+          $scope.dateRangePicker.startDate = angular.copy($scope.startDate);
+          $scope.dateRangePicker.endDate = angular.copy($scope.endDate);
+        };
+
         $scope.isCurrentPicker = function (picker) {
           return currentPicker === picker;
         };
@@ -428,7 +468,7 @@
         };
 
         $scope.getDisplayedDate = function (date) {
-          return moment(date, $scope.options.format).format('D. MMMM YYYY');
+          return moment(date, $scope.options.format).format('DD.MM.YYYY');
         }
       }
     };
@@ -468,58 +508,83 @@
   }]);
 
 
-  angular.module('kt.datePicker').directive('ktDateRangePickerInput', ['ktDateBoundsService', function (ktDateBounds) {
-    var instanceCount = 0;
-
+  angular.module('kt.datePicker').directive('ktDateRangeInput', ['ktDateBoundsService', function (ktDateBounds) {
     return {
-      restrict   : 'E',
+      restrict   : 'A',
+      require    : 'ngModel',
       scope      : {
-        startDate: '=',
-        endDate  : '=',
-        minDate  : '=',
-        maxDate  : '=',
-        format   : '@',
-        divider  : '@'
+        options: '='
       },
-      templateUrl: 'html/kt-date-range-picker-input.html',
-      link       : function (scope) {
-        scope.instanceCount = instanceCount++;
-        scope.dateRangeString = '';
+      link       : function (scope, elem, attrs, ngModelCtrl) {
+        var originalStartMoment;
+        var originalEndMoment;
+        var formatted = false;
 
-        scope.startDate = ktDateBounds.getDateWithinBounds(scope.startDate, scope.minDate, scope.maxDate);
-        scope.endDate = ktDateBounds.getDateWithinBounds(scope.endDate, scope.minDate, scope.maxDate);
+        function getMomentsFromRangeString(rangeString) {
+          var components = rangeString.split(scope.options.divider);
+          return {
+            startDate: moment(components[0], scope.options.inputFormat, true),
+            endDate: moment(components[1], scope.options.inputFormat, true)
+          };
+        }
 
-        scope.$watch('[startDate, endDate]', function (dates) {
-          scope.dateRangeString = dates[0].format(scope.format) + scope.divider + dates[1].format(scope.format);
+        function formatter(modelValue) {
+          formatted = true;
+
+          ngModelCtrl.$setValidity('date-range', true);
+
+          originalStartMoment = angular.copy(
+            ktDateBounds.getMomentWithinBounds(modelValue[scope.options.startProperty], null, null, {format: scope.options.format})
+          );
+
+          originalEndMoment = angular.copy(
+            ktDateBounds.getMomentWithinBounds(modelValue[scope.options.endProperty], null, null, {format: scope.options.format})
+          );
+
+          return originalStartMoment.format(scope.options.inputFormat) + scope.options.divider + originalEndMoment.format(scope.options.inputFormat);
+        }
+
+        ngModelCtrl.$formatters.push(formatter);
+
+        ngModelCtrl.$parsers.push(function (viewValue) {
+          var dates = getMomentsFromRangeString(viewValue);
+          var range = {};
+
+          if (!dates.startDate.isValid() || !dates.endDate.isValid()) {
+            ngModelCtrl.$setValidity('date-range', false);
+            return ngModelCtrl.$modelValue;
+          }
+
+          if (!ktDateBounds.isDateWithinBounds(dates.endDate, dates.startDate)) {
+            ngModelCtrl.$setValidity('date-range-bounds', false);
+            return ngModelCtrl.$modelValue;
+          }
+
+          ngModelCtrl.$setValidity('date-range', true);
+          ngModelCtrl.$setValidity('date-range-bounds', true);
+
+          originalStartMoment = originalStartMoment.year(dates.startDate.year()).month(dates.startDate.month()).date(dates.startDate.date());
+          originalEndMoment = originalEndMoment.year(dates.endDate.year()).month(dates.endDate.month()).date(dates.endDate.date());
+
+          range[scope.options.startProperty] = scope.options.format ? originalStartMoment.format(scope.options.format) : originalStartMoment;
+          range[scope.options.endProperty] = scope.options.format ? originalEndMoment.format(scope.options.format) : originalEndMoment;
+
+          return range;
+        });
+
+        scope.$watch(function () {
+          return ngModelCtrl.$modelValue;
+        }, function (model) {
+          if (!formatted) {
+            ngModelCtrl.$setViewValue(formatter(model));
+            ngModelCtrl.$render();
+          }
+
+          formatted = false;
         }, true);
-
-        scope.dateRangeStringChanged = function () {
-          var dates = scope.dateRangeString.split(scope.divider);
-
-          if (dates.length !== 2) {
-            return;
-          }
-
-          var startDate = moment(dates[0], scope.format, true);
-          var endDate = moment(dates[1], scope.format, true);
-
-          if (!startDate.isValid() || !endDate.isValid()) {
-            return;
-          }
-
-          if (
-            !ktDateBounds.isDateWithinBounds(startDate, scope.minDate, scope.maxDate, {inclusivity: '[]'}) || !ktDateBounds.isDateWithinBounds(endDate, startDate, scope.maxDate, {inclusivity: '[]'})
-          ) {
-            return;
-          }
-
-          scope.startDate.year(startDate.year()).month(startDate.month()).date(startDate.date());
-          scope.endDate.year(endDate.year()).month(endDate.month()).date(endDate.date());
-        };
       }
     };
-  }]);
-
+  }])
 
 
 
@@ -537,7 +602,6 @@
   ktDayHeader.$inject = ['ktDayPickerSvc'];
 
   angular.module('kt.datePicker').directive('ktDayHeader', ktDayHeader);
-
 
 
 
@@ -573,7 +637,17 @@
         }, function(newValue) {
           scope.date = moment(newValue, scope.options.format);
           resetDayPicker(scope.date);
-        });
+        }, true);
+
+        scope.$watch('options', function (options) {
+          var date = ktDateBounds.getMomentWithinBounds(ngModelController.$modelValue, options.minDate, options.maxDate, {
+            precision  : 'day',
+            inclusivity: '[]',
+            format     : options.format
+          });
+
+          ngModelController.$setViewValue(options.format ? date.format(options.format) : date);
+        }, true);
 
         scope.selectDate = function (date) {
           scope.date.year(date.year()).month(date.month()).date(date.date());
@@ -658,7 +732,6 @@
   ktDayPicker.$inject = ['ktDayPickerSvc', 'ktDateBoundsService'];
 
   angular.module('kt.datePicker').directive('ktDayPicker', ktDayPicker);
-
 
 
 
@@ -786,127 +859,6 @@
         }
       };
     }]);
-
-
-
-
-
-  angular
-
-    .module('kt.datePicker')
-
-    .directive('ktTimePicker', [function () {
-      var hours, minutes;
-
-      function getHours() {
-        if (!hours) {
-          hours = [];
-          for (var i = 0; i < 24; i++) {
-            hours.push(i);
-          }
-        }
-
-        return hours;
-      }
-
-      function getMinutes() {
-        if (!minutes) {
-          minutes = [];
-          for (var i = 0; i < 60; i++) {
-            minutes.push(i);
-          }
-        }
-
-        return minutes;
-      }
-
-      return {
-        restrict   : 'E',
-        templateUrl: 'html/kt-time-picker.html',
-        scope      : {
-          date: '='
-        },
-        link       : function (scope) {
-          scope.timePicker = {
-            hours  : getHours(),
-            minutes: getMinutes()
-          };
-
-          scope.isHourSelected = function (hour) {
-            if (!scope.date) {
-              return false;
-            }
-
-            return scope.date.hour() === hour;
-          };
-
-          scope.isMinuteSelected = function (minute) {
-            if (!scope.date) {
-              return false;
-            }
-
-            return scope.date.minute() === minute;
-          };
-
-          scope.selectHour = function (hour) {
-            if (!scope.date) {
-              scope.date = moment().clone().hour(hour);
-            } else {
-              scope.date.hour(hour);
-            }
-          };
-
-          scope.selectMinute = function (minute) {
-            if (!scope.date) {
-              scope.date = moment().clone().minute(minute);
-            } else {
-              scope.date.minute(minute);
-            }
-          };
-        }
-      };
-    }])
-
-    .directive('ktTimePickerInput', [function () {
-      var instanceCount = 0;
-
-      return {
-        restrict: 'E',
-        scope   : {
-          date  : '=',
-          format: '@'
-        },
-        template: '<input type="text" ng-model="timeString" ng-change="timeStringChanged()" kt-dropdown=".ktTimePickerInput_{{instanceCount}}">' +
-        '<kt-time-picker class="ktTimePickerInput_{{instanceCount}}" date="date"></kt-time-picker>',
-        link    : function (scope) {
-          scope.instanceCount = instanceCount++;
-          scope.timeString = '';
-
-          scope.$watch('date', function (date) {
-            if (!date) {
-              return;
-            }
-
-            scope.timeString = date.format(scope.format);
-          }, true);
-
-          scope.timeStringChanged = function () {
-            var date = moment(scope.timeString, scope.format, true);
-
-            if (!date.isValid()) {
-              return;
-            }
-
-            if (!scope.date) {
-              scope.date = date.clone();
-            } else {
-              scope.date.hour(date.hour()).minute(date.minute());
-            }
-          };
-        }
-      };
-    }]);
-
 
 
 
@@ -1046,13 +998,7 @@
 
 
 
-angular.module('kt.datePicker').run(['$templateCache', function($templateCache) {
-  $templateCache.put("html/kt-date-picker-input.html",
-    "<div>\n" +
-    "  <input type=\"text\" ng-model=\"dateString\" ng-change=\"dateStringChanged()\" kt-dropdown=\".ktDatePickerInput_{{instanceCount}}\">\n" +
-    "  <kt-date-picker class=\"ktDatePickerInput_{{instanceCount}} kt-dropdown-target\" date=\"date\" min-date=\"minDate\" max-date=\"maxDate\"></kt-date-picker>\n" +
-    "</div>\n" +
-    "");
+angular.module('kt.datePicker').run(['$templateCache', function ($templateCache) {
   $templateCache.put("html/kt-date-picker.html",
     "<kt-day-picker\n" +
     "    ng-model=\"ngModel\" options=\"options\"\n" +
@@ -1066,12 +1012,6 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "    ng-model=\"ngModel\" options=\"options\"\n" +
     "    ng-show=\"isCurrentPicker('year')\">\n" +
     "</kt-year-picker>\n" +
-    "");
-  $templateCache.put("html/kt-date-range-picker-input.html",
-    "<div>\n" +
-    "  <input type=\"text\" ng-model=\"dateRangeString\" ng-change=\"dateRangeStringChanged()\" kt-dropdown=\".ktDateRangePickerInput_{{instanceCount}}\">\n" +
-    "  <kt-date-range-picker class=\"ktDateRangePickerInput_{{instanceCount}} kt-dropdown-target\" start-date=\"startDate\" end-date=\"endDate\" min-date=\"minDate\" max-date=\"maxDate\"></kt-date-range-picker>\n" +
-    "</div>\n" +
     "");
   $templateCache.put("html/kt-date-range-picker.html",
     "<div class=\"kt-dp-flex-row kt-dp-range-navigation\">\n" +
@@ -1137,7 +1077,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
   $templateCache.put("html/kt-day-picker.html",
     "<div class=\"kt-dp-flex-row kt-dp-navigation\">\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"previousMonth()\" ng-if=\"hasPreviousMonth()\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"previousMonth()\" ng-show=\"hasPreviousMonth()\">\n" +
     "      <kt-date-picker-icon icon=\"#chevron_left_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
@@ -1148,7 +1088,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"nextMonth()\" ng-if=\"hasNextMonth()\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"nextMonth()\" ng-show=\"hasNextMonth()\">\n" +
     "      <kt-date-picker-icon icon=\"#chevron_right_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
@@ -1173,7 +1113,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
   $templateCache.put("html/kt-month-picker.html",
     "<div class=\"kt-dp-flex-row kt-dp-navigation\">\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"previousYear()\" ng-if=\"hasPreviousYear()\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"previousYear()\" ng-show=\"hasPreviousYear()\">\n" +
     "      <kt-date-picker-icon icon=\"#chevron_left_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
@@ -1183,7 +1123,7 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"nextYear()\" ng-if=\"hasNextYear()\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"nextYear()\" ng-show=\"hasNextYear()\">\n" +
     "      <kt-date-picker-icon icon=\"#chevron_right_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
@@ -1201,49 +1141,20 @@ angular.module('kt.datePicker').run(['$templateCache', function($templateCache) 
     "</div>\n" +
     "\n" +
     "");
-  $templateCache.put("html/kt-time-picker.html",
-    "<div>\n" +
-    "  <div class=\"kt-date-picker-header\">\n" +
-    "    <div>Hour</div>\n" +
-    "    <div>Minute</div>\n" +
-    "  </div>\n" +
-    "  <div class=\"kt-date-picker-content\">\n" +
-    "    <div class=\"kt-time-picker-outer\">\n" +
-    "      <div class=\"kt-time-picker-inner\" kt-hide-scrollbar>\n" +
-    "        <div class=\"kt-time-picker-cell\"\n" +
-    "             ng-repeat=\"hour in timePicker.hours\"\n" +
-    "             ng-class=\"{'kt-date-picker-selected': isHourSelected(hour)}\">\n" +
-    "          <button type=\"button\" ng-click=\"selectHour(hour)\">{{hour}}</button>\n" +
-    "        </div>\n" +
-    "      </div>\n" +
-    "    </div>\n" +
-    "    <div class=\"kt-time-picker-outer\">\n" +
-    "      <div class=\"kt-time-picker-inner\" kt-hide-scrollbar>\n" +
-    "        <div class=\"kt-time-picker-cell\"\n" +
-    "             ng-repeat=\"minute in timePicker.minutes\"\n" +
-    "             ng-class=\"{'kt-date-picker-selected': isMinuteSelected(minute)}\">\n" +
-    "          <button type=\"button\" ng-click=\"selectMinute(minute)\">{{minute}}</button>\n" +
-    "        </div>\n" +
-    "      </div>\n" +
-    "    </div>\n" +
-    "  </div>\n" +
-    "  <div class=\"kt-date-picker-footer\"></div>\n" +
-    "</div>\n" +
-    "");
   $templateCache.put("html/kt-year-picker.html",
     "<div class=\"kt-dp-flex-row kt-dp-navigation\">\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"previousDecade()\" ng-if=\"hasPreviousDecade()\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"previousDecade()\" ng-show=\"hasPreviousDecade()\">\n" +
     "      <kt-date-picker-icon icon=\"#chevron_left_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" disabled=\"disabled\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button kt-dp-button--preserve-color\" disabled=\"disabled\">\n" +
     "      {{yearPicker.decade.start}} - {{yearPicker.decade.end}}\n" +
     "    </button>\n" +
     "  </div>\n" +
     "  <div class=\"kt-dp-flex-cell\">\n" +
-    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"nextDecade()\" ng-if=\"hasNextDecade()\">\n" +
+    "    <button type=\"button\" class=\"kt-dp-button\" ng-click=\"nextDecade()\" ng-show=\"hasNextDecade()\">\n" +
     "      <kt-date-picker-icon icon=\"#chevron_right_18\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +

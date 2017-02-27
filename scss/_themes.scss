@@ -33,7 +33,7 @@ $kt-dp-themes : (
     padding             : .5rem,
     round-buttons       : true
   )
-);
+) !default;
 
 @function theme-property($theme, $property) {
   $theme: map_get($kt-dp-themes, $theme);
