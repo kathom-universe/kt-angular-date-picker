@@ -103,30 +103,48 @@
   angular.module('kt.datePicker').value('ktDateRanges', [
     {
       rangeName: 'past_week',
-      start    : function () {
-        return moment().clone().subtract(1, 'weeks');
-      },
-      end      : function () {
-        return moment().clone();
-      }
+      start    : function () { return moment().clone().subtract(1, 'weeks').startOf('day'); },
+      end      : function () { return moment().clone().endOf('day'); }
     },
     {
-      rangeName   : 'past_month',
-      start       : function () {
-        return moment().clone().subtract(1, 'months');
-      },
-      end         : function () {
-        return moment().clone();
-      }
+      rangeName: 'past_month',
+      start    : function () { return moment().clone().subtract(1, 'months').startOf('day'); },
+      end      : function () { return moment().clone().endOf('day'); }
     },
     {
       rangeName: 'past_year',
-      start    : function () {
-        return moment().clone().subtract(1, 'year');
-      },
-      end      : function () {
-        return moment().clone();
-      }
+      start    : function () { return moment().clone().subtract(1, 'year').startOf('day'); },
+      end      : function () { return moment().clone().endOf('day'); }
+    },
+    {
+      rangeName: 'upcoming_week',
+      start    : function () { return moment().clone().startOf('day'); },
+      end      : function () { return moment().clone().add(1, 'weeks').endOf('day'); }
+    },
+    {
+      rangeName: 'upcoming_month',
+      start    : function () { return moment().clone().startOf('day'); },
+      end      : function () { return moment().clone().add(1, 'months').endOf('day'); }
+    },
+    {
+      rangeName: 'upcoming_year',
+      start    : function () { return moment().clone().startOf('day'); },
+      end      : function () { return moment().clone().add(1, 'years').endOf('day'); }
+    },
+    {
+      rangeName: 'this_year',
+      start    : function () { return moment().clone().startOf('year'); },
+      end      : function () { return moment().clone().endOf('year'); }
+    },
+    {
+      rangeName: 'this_year_past',
+      start    : function () { return moment().clone().startOf('year'); },
+      end      : function () { return moment().clone().endOf('day'); }
+    },
+    {
+      rangeName: 'this_year_future',
+      start    : function () { return moment().clone().startOf('day'); },
+      end      : function () { return moment().clone().endOf('year'); }
     }
   ]);
 
@@ -135,19 +153,31 @@
     {
       locale   : 'en',
       dateRange: {
-        'past_week' : 'Past Week',
-        'past_month': 'Past Month',
-        'past_year' : 'Past Year',
-        'custom'    : 'Custom'
+        'past_week'       : 'Past Week',
+        'past_month'      : 'Past Month',
+        'past_year'       : 'Past Year',
+        'upcoming_week'   : 'Upcoming Week',
+        'upcoming_month'  : 'Upcoming Month',
+        'upcoming_year'   : 'Upcoming Year',
+        'this_year'       : 'This Year',
+        'this_year_past'  : 'This Year',
+        'this_year_future': 'This Year',
+        'custom'          : 'Custom'
       }
     },
     {
       locale   : 'de',
       dateRange: {
-        'past_week' : 'Letzte 7 Tage',
-        'past_month': 'Letzte 30 Tage',
-        'past_year' : 'Letztes Jahr',
-        'custom'    : 'Benutzerdefiniert'
+        'past_week'       : 'Letzte 7 Tage',
+        'past_month'      : 'Letzte 30 Tage',
+        'past_year'       : 'Letztes Jahr',
+        'upcoming_week'   : 'Nächste 7 Tage',
+        'upcoming_month'  : 'Nächste 30 Tage',
+        'upcoming_year'   : 'Nächstes Jahr',
+        'this_year'       : 'Dieses Jahr',
+        'this_year_past'  : 'Dieses Jahr',
+        'this_year_future': 'Dieses Jahr',
+        'custom'          : 'Benutzerdefiniert'
       }
     }
   ]);
@@ -392,7 +422,7 @@
 
 
 
-  angular.module('kt.datePicker').directive('ktDateRangePicker', ['ktDateBoundsService', function (ktDateBounds) {
+  angular.module('kt.datePicker').directive('ktDateRangePicker', ['ktDateBoundsService', 'ktDateRangeSvc', function (ktDateBounds, dateRangeSvc) {
     return {
       restrict   : 'E',
       scope      : {
@@ -402,7 +432,29 @@
       },
       templateUrl: 'html/kt-date-range-picker.html',
       controller : function ($scope) {
+        var currentPicker = 'range';
+
         $scope.options = $scope.options || {};
+
+        this.requestNextRange = function () {
+          currentPicker = currentPicker === 'start' ? 'end' : 'start';
+        };
+
+        this.setRange = function (rangeName) {
+          if (rangeName === 'custom') {
+            currentPicker = 'start';
+            return;
+          }
+
+          var range = dateRangeSvc.getDateRange(rangeName);
+
+          $scope.startDate = $scope.options.format ? range.start().format($scope.options.format) : range.start();
+          $scope.endDate = $scope.options.format ? range.end().format($scope.options.format) : range.end();
+        };
+
+        if ($scope.options.initialRange) {
+          this.setRange($scope.options.initialRange);
+        }
 
         $scope.dateRangePicker = {
           startDate: angular.copy($scope.startDate),
@@ -421,16 +473,6 @@
           maxDate        : $scope.options.maxDate,
           format         : $scope.options.format,
           overflowEnabled: $scope.options.overflowEnabled
-        };
-
-        var currentPicker = 'start';
-
-        this.requestNextRange = function () {
-          currentPicker = currentPicker === 'start' ? 'end' : 'start';
-        };
-
-        this.requestCustomRange = function () {
-          currentPicker = 'start';
         };
 
         $scope.$watchGroup(['startDate', 'endDate'], function () {
@@ -475,7 +517,7 @@
   }]);
 
 
-  angular.module('kt.datePicker').directive('ktDateRangeSelect', ['ktDateRangeSvc', function (dateRangeSvc) {
+  angular.module('kt.datePicker').directive('ktDateRangeSelect', [function () {
     return {
       restrict   : 'E',
       require    : '^?ktDateRangePicker',
@@ -487,21 +529,8 @@
       },
       templateUrl: 'html/kt-date-range-select.html',
       link: function (scope, elem, attrs, ktDateRangePicker) {
-        scope.options = scope.options || angular.extend({
-          format: undefined,
-          ranges: dateRangeSvc.getDateRangeNames().concat(['custom'])
-        }, scope.options);
-
         scope.setRange = function (rangeName) {
-          if (rangeName === 'custom') {
-            ktDateRangePicker.requestCustomRange();
-            return;
-          }
-
-          var range = dateRangeSvc.getDateRange(rangeName);
-
-          scope.startDate = scope.options.format ? range.start().format(scope.options.format) : range.start();
-          scope.endDate = scope.options.format ? range.end().format(scope.options.format) : range.end();
+          ktDateRangePicker.setRange(rangeName);
         };
       }
     };
@@ -584,7 +613,7 @@
         }, true);
       }
     };
-  }])
+  }]);
 
 
 

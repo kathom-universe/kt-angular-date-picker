@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  angular.module('kt.datePicker').directive('ktDateRangePicker', ['ktDateBoundsService', function (ktDateBounds) {
+  angular.module('kt.datePicker').directive('ktDateRangePicker', ['ktDateBoundsService', 'ktDateRangeSvc', function (ktDateBounds, dateRangeSvc) {
     return {
       restrict   : 'E',
       scope      : {
@@ -11,7 +11,29 @@
       },
       templateUrl: 'html/kt-date-range-picker.html',
       controller : function ($scope) {
+        var currentPicker = 'range';
+
         $scope.options = $scope.options || {};
+
+        this.requestNextRange = function () {
+          currentPicker = currentPicker === 'start' ? 'end' : 'start';
+        };
+
+        this.setRange = function (rangeName) {
+          if (rangeName === 'custom') {
+            currentPicker = 'start';
+            return;
+          }
+
+          var range = dateRangeSvc.getDateRange(rangeName);
+
+          $scope.startDate = $scope.options.format ? range.start().format($scope.options.format) : range.start();
+          $scope.endDate = $scope.options.format ? range.end().format($scope.options.format) : range.end();
+        };
+
+        if ($scope.options.initialRange) {
+          this.setRange($scope.options.initialRange);
+        }
 
         $scope.dateRangePicker = {
           startDate: angular.copy($scope.startDate),
@@ -30,16 +52,6 @@
           maxDate        : $scope.options.maxDate,
           format         : $scope.options.format,
           overflowEnabled: $scope.options.overflowEnabled
-        };
-
-        var currentPicker = 'start';
-
-        this.requestNextRange = function () {
-          currentPicker = currentPicker === 'start' ? 'end' : 'start';
-        };
-
-        this.requestCustomRange = function () {
-          currentPicker = 'start';
         };
 
         $scope.$watchGroup(['startDate', 'endDate'], function () {
@@ -84,7 +96,7 @@
   }]);
 
 
-  angular.module('kt.datePicker').directive('ktDateRangeSelect', ['ktDateRangeSvc', function (dateRangeSvc) {
+  angular.module('kt.datePicker').directive('ktDateRangeSelect', [function () {
     return {
       restrict   : 'E',
       require    : '^?ktDateRangePicker',
@@ -96,21 +108,8 @@
       },
       templateUrl: 'html/kt-date-range-select.html',
       link: function (scope, elem, attrs, ktDateRangePicker) {
-        scope.options = scope.options || angular.extend({
-          format: undefined,
-          ranges: dateRangeSvc.getDateRangeNames().concat(['custom'])
-        }, scope.options);
-
         scope.setRange = function (rangeName) {
-          if (rangeName === 'custom') {
-            ktDateRangePicker.requestCustomRange();
-            return;
-          }
-
-          var range = dateRangeSvc.getDateRange(rangeName);
-
-          scope.startDate = scope.options.format ? range.start().format(scope.options.format) : range.start();
-          scope.endDate = scope.options.format ? range.end().format(scope.options.format) : range.end();
+          ktDateRangePicker.setRange(rangeName);
         };
       }
     };
@@ -193,5 +192,5 @@
         }, true);
       }
     };
-  }])
+  }]);
 })();

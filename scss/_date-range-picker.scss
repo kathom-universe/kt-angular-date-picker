@@ -9,15 +9,7 @@
   @return kt-date-picker-width($theme);
 }
 
-@mixin _kt-date-range-navigation($theme) {
-  .kt-dp--theme-#{$theme} .kt-dp-range-navigation {
-    margin-bottom : theme-property($theme, 'margin-navigation');
-  }
-}
-
 @mixin _kt-date-range-picker-box($theme) {
-  @include _kt-date-range-navigation($theme);
-
   kt-date-range-picker.kt-dp--theme-#{$theme} {
     background : theme-property($theme, 'background');
     display    : inline-block;
