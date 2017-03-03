@@ -444,7 +444,8 @@
       scope      : {
         startDate: '=',
         endDate  : '=',
-        options  : '='
+        options  : '=',
+        onRangeApplied: '&'
       },
       templateUrl: 'html/kt-date-range-picker.html',
       controller : function ($scope) {
@@ -466,6 +467,8 @@
 
           $scope.startDate = $scope.options.format ? range.start().format($scope.options.format) : range.start();
           $scope.endDate = $scope.options.format ? range.end().format($scope.options.format) : range.end();
+
+          $scope.onRangeApplied();
         };
 
         if ($scope.options.initialRange) {
@@ -510,6 +513,7 @@
         $scope.applyChanges = function () {
           $scope.startDate = $scope.dateRangePicker.startDate;
           $scope.endDate = $scope.dateRangePicker.endDate;
+          $scope.onRangeApplied();
         };
 
         $scope.updateBindings = function () {
