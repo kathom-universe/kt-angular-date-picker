@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  angular.module('kt.datePicker').directive('ktDateRangePicker', ['ktDateBoundsService', 'ktDateRangeSvc', function (ktDateBounds, dateRangeSvc) {
+  angular.module('kt.datePicker').directive('ktDateRangePicker', ['ktDateBoundsService', 'ktDateRangeConfig', function (ktDateBounds, dateRangeConfig) {
     return {
       restrict   : 'E',
       scope      : {
@@ -25,7 +25,7 @@
             return;
           }
 
-          var range = dateRangeSvc.getDateRange(rangeName);
+          var range = dateRangeConfig.getRange(rangeName);
 
           $scope.startDate = $scope.options.format ? range.start().format($scope.options.format) : range.start();
           $scope.endDate = $scope.options.format ? range.end().format($scope.options.format) : range.end();

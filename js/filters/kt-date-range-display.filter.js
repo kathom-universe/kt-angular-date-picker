@@ -1,13 +1,9 @@
 (function () {
   'use strict';
 
-  angular.module('kt.datePicker').filter('ktDateRangeDisplay', ['ktDateRangeLocales', function (dateRangeLocales) {
+  angular.module('kt.datePicker').filter('ktDateRangeDisplay', ['ktDateRangeConfig', function (dateRangeConfig) {
     return function (rangeName) {
-      var dateRangeLocale = dateRangeLocales.filter(function (dateRangeLocale) {
-        return dateRangeLocale.locale === moment.locale();
-      })[0];
-
-      return dateRangeLocale.dateRange[rangeName];
+      return dateRangeConfig.getRangeTranslation(rangeName, moment.locale());
     };
   }]);
 })();
