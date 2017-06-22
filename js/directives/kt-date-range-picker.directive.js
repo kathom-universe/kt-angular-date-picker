@@ -61,6 +61,17 @@
           $scope.updateBindings();
         }, true);
 
+        function applyChangesWhenEndDateSelected() {
+          $scope.$watch(function () {
+            return $scope.dateRangePicker.endDate;
+          }, function () {
+            if(currentPicker === 'start' && $scope.options.applyOnEndDateSelected) {
+              $scope.applyChanges();
+            }
+          });
+        }
+        applyChangesWhenEndDateSelected();
+
         $scope.$watch(function () {
           return $scope.dateRangePicker.startDate;
         }, function (startDate) {
