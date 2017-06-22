@@ -498,6 +498,17 @@
           $scope.updateBindings();
         }, true);
 
+        function applyChangesWhenEndDateSelected() {
+          $scope.$watch(function () {
+            return $scope.dateRangePicker.endDate;
+          }, function () {
+            if(currentPicker === 'start' && $scope.options.applyOnEndDateSelected) {
+              $scope.applyChanges();
+            }
+          });
+        }
+        applyChangesWhenEndDateSelected();
+
         $scope.$watch(function () {
           return $scope.dateRangePicker.startDate;
         }, function (startDate) {
@@ -1102,7 +1113,7 @@ angular.module('kt.datePicker').run(['$templateCache', function ($templateCache)
     "      <kt-date-picker-icon icon=\"#date_range_24\"></kt-date-picker-icon>\n" +
     "    </button>\n" +
     "  </div>\n" +
-    "  <div class=\"kt-dp-flex-cell\">\n" +
+    "  <div class=\"kt-dp-flex-cell\" ng-show=\"!options.applyOnEndDateSelected\">\n" +
     "    <button class=\"kt-dp-button\" ng-click=\"applyChanges()\">\n" +
     "      <kt-date-picker-icon icon=\"#done_24\"></kt-date-picker-icon>\n" +
     "    </button>\n" +

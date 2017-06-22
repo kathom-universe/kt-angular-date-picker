@@ -109,5 +109,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-svgstore');
 
   grunt.registerTask('build-css', ['sass', 'postcss']);
+  grunt.registerTask('build', ['build-css', 'html2js', 'concat']);
   grunt.registerTask('default', ['watch']);
 };
